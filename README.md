@@ -3,6 +3,7 @@
 Write something here
 ## Data Prepration
 Create a new environment for SAPC
+```conda create --name SAPC```
 ### Download Data
 * To use the SAP data, sign our data user agreement [here](https://speechaccessibilityproject.beckman.illinois.edu/conduct-research-through-the-project).
 * Download the data and rename the folder into ```/DatasetDownload```
