@@ -9,7 +9,7 @@ PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/SAPC
 conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
 
 splits="train dev test"
-database=$PWD/../datasets/SpeechAcc/${release}
+database=$PWD/../datasets/SpeechAcc/
 working_dir=$PWD
 datadest=${working_dir}/data
 manifest_dir=${working_dir}/manifest
