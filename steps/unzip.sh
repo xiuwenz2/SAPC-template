@@ -1,14 +1,15 @@
 #!bin/sh
-download=$PWB/DatasetDownload
-database=$PWB/data
+download=$PWD/DatasetDownload
+database=$PWD/data
 mkdir -p ${database}; mkdir -p ${database}/raw; mkdir -p ${database}/doc
 
 for file in `ls ${download} | grep "**.7z"`; do
-    echo "$file already merged"
-    if [grep "Json.7z"]; then
-        
+    if [ "$file" == `ls ${download} | grep "Json.7z"` ]
+    then
+        7za x ${download}/${file} -r -o${database}/doc
+    else
+        7za x ${download}/${file} -r -o${database}/raw
     fi
-    7za x ${download}/${file} -r -o${database}
 done
 
 for file in `ls ${download} | grep "**.json"`; do
