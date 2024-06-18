@@ -1,16 +1,13 @@
 #!/bin/bash
-## activate environment
-usr=xiuwenz2
-source /home/${usr}/.bashrc
-PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/wav2vec
-conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
 
-## set stages
 stage=0
 stop_stage=0
 
-## basic info
-release=2024-04-30
+usr=???
+source /home/${usr}/.bashrc
+PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/SAPC
+conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
+
 splits="train dev test"
 database=$PWD/../datasets/SpeechAcc/${release}
 working_dir=$PWD
@@ -26,7 +23,6 @@ if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
         echo "writing ${release}-${split}-16k to ${datadest}"
         python ${working_dir}/utils/resample.py \
             --tag ${split} \
-            --release ${release} \
             --database ${database} \
             --datadest ${datadest} \
             --sr 16000
