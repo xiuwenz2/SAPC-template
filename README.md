@@ -3,5 +3,4 @@
 Write something here
 ## Data Prepration
 * To use the SAP data, sign our data user agreement [here](URL "https://speechaccessibilityproject.beckman.illinois.edu/conduct-research-through-the-project").
-* Download the data in .zip files into 
-```bash```
+* Download the data and rename the folder into ```/DatasetDownload```
