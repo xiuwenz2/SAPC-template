@@ -1,6 +1,8 @@
 #!bin/sh
 download=$PWB/DatasetDownload
 database=data/raw
+mkdir -p data
+mkdir -p ${database}
 
 for file in `ls ${download} | grep "**.7z"`; do
     7za x ${download}/${file} -r -o${database}
