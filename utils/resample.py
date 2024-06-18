@@ -17,12 +17,6 @@ def get_parser():
         "--tag", default="dev", type=str, metavar="TAG", help="name of split"
     )
     parser.add_argument(
-        "--ext", default="wav", type=str, metavar="EXT", help="extension to look for"
-    )
-    parser.add_argument(
-        "--release", default="2023-10-05", type=str, metavar="RELEASE", help="release of the Speech Accessibility Corpus"
-    )
-    parser.add_argument(
         "--database", default="/home/xiuwenz2/datasets/SpeechAcc/2023-10-05", metavar="DATABASE", help="root directory containing wav files to index"
     )
     parser.add_argument(
