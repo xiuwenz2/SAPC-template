@@ -8,3 +8,7 @@ Write something here
 * Install 7-zip [here](https://www.7-zip.org/download.html) and unzip the data package using ```bash steps/unzip.sh```.
 ### Data Preprocess
 ```bash steps/preprocess.sh```
+* Stage 0
+* Stage 1
+* Stage 2
+* Stage 3
