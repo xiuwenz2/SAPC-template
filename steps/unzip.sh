@@ -1,8 +1,6 @@
 #!bin/sh
-base=/home/xiuwenz2/datasets/SpeechAcc
-release=2024-04-30
 download=$PWB/DatasetDownload
-database=${base}/${release}
+database=data/raw
 
 for file in `ls ${download} | grep "**.7z"`; do
     7za x ${download}/${file} -r -o${database}
