@@ -6,7 +6,7 @@ Create a new environment for SAPC using ```conda create --name SAPC```
 ### Download Data
 * To use the SAP data, sign our data user agreement [here](https://speechaccessibilityproject.beckman.illinois.edu/conduct-research-through-the-project).
 * Download the data and rename the folder into ```/DatasetDownload```
-* Install 7-zip ```sudo apt install p7zip``` and unzip the data package ```bash steps/unzip.sh```.
+* Unzip the data package ```bash steps/unzip.sh```.
 ### Preprocess Data
 ```bash steps/preprocess.sh```
 * Stage 0 - audio resampling
