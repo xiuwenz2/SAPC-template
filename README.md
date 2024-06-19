@@ -5,4 +5,5 @@ Write something here
 * To use the SAP data, sign our data user agreement [here](https://speechaccessibilityproject.beckman.illinois.edu/conduct-research-through-the-project).
 * Download and rename the data folder into ```/DatasetDownload```.
 * Unzip the data package using ```bash steps/unzip.sh```.
+* Build conda environment using ```bash steps/setup.sh```.
 * Preprocess the data using ```bash steps/preprocess.sh```.
