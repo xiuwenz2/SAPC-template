@@ -9,6 +9,7 @@ PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/SAPC
 conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
 
 working_dir=$PWD
+release=2024-04-30
 splits="train dev test"
 
 ## run stage 0
@@ -20,7 +21,8 @@ if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
         echo "writing ${split}-16k to ${datadest}"
         python ${working_dir}/utils/resample.py \
             --tag ${split} \
-            --database ${working_dir}/data/raw \
+            --release ${release} \
+            --database ${working_dir}/data \
             --datadest ${working_dir}/data/processed/${split} \
             --sr 16000
     done
