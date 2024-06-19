@@ -8,23 +8,20 @@ source /home/${usr}/.bashrc
 PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/SAPC
 conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
 
-splits="train dev test"
-database=$PWD/../datasets/SpeechAcc/
 working_dir=$PWD
-datadest=${working_dir}/data
-manifest_dir=${working_dir}/manifest
+splits="train dev test"
 
 ## run stage 0
 if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
     echo "Stage 0: resample audios to 16k..."
-    mkdir -p ${datadest}
+    mkdir -p ${working_dir}/data/processed
     for split in ${splits}; do
-        mkdir -p ${datadest}/${split}
-        echo "writing ${release}-${split}-16k to ${datadest}"
+        mkdir -p ${working_dir}/data/processed/${split}
+        echo "writing ${split}-16k to ${datadest}"
         python ${working_dir}/utils/resample.py \
             --tag ${split} \
-            --database ${database} \
-            --datadest ${datadest} \
+            --database ${working_dir}/data/raw \
+            --datadest ${working_dir}/data/processed/${split} \
             --sr 16000
     done
 fi
