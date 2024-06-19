@@ -17,29 +17,32 @@ def get_parser():
         "--tag", default="dev", type=str, metavar="TAG", help="name of split"
     )
     parser.add_argument(
-        "--database", default="/home/xiuwenz2/datasets/SpeechAcc/2023-10-05", metavar="DATABASE", help="root directory containing wav files to index"
+        "--release", default="???", type=str, metavar="DATADEST", help="release of the dataset"
     )
     parser.add_argument(
-        "--datadest", default="/home/xiuwenz2/SpeechAcc/data/2023-10-05", type=str, metavar="DATADEST", help="dest directory containing new wav files to index"
+        "--database", default="???", metavar="DATABASE", help="root directory containing wav files to index"
+    )
+    parser.add_argument(
+        "--datadest", default="???", type=str, metavar="DATADEST", help="dest directory containing new wav files to index"
     )
     parser.add_argument(
         "--sr", default=16000, type=int, metavar="SAMPLERATE", help="ideal sample rate"
     )
     return parser
 
-def get_fn(database, release, tag, ext):
+def get_fn(database, release, tag):
     with open(
-        os.path.join(database, "SpeechAccessibility_"+release+"_Split_by_Contributors.json"), 'r'
+        os.path.join(database, "doc", "SpeechAccessibility_"+release+"_Split_by_Contributors.json"), 'r'
     ) as f:
         for contributor in json.load(f)[tag]:
             for _, _, files in os.walk(os.path.join(database, contributor)):
                 for file in files:
-                    if not file.endswith(ext):
+                    if not file.endswith(".wav"):
                         continue
                     yield os.path.join(database, contributor, file)
 
 def main(args):
-    for fname in get_fn(args.database, args.release, args.tag, args.ext):
+    for fname in get_fn(args.database, args.release, args.tag):
         targ_path = os.path.join(args.datadest, args.tag, fname.split("/")[-1])
         if os.path.exists(targ_path):
             continue
