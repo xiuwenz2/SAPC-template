@@ -8,22 +8,23 @@ source /home/${usr}/.bashrc
 PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/SAPC
 conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
 
-working_dir=$PWD
+cwd=$(pwd)
+working_dir=${cwd}
 release=2024-04-30
 splits="train dev test"
 
 ## run stage 0
 if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
     echo "Stage 0: resample audios to 16k..."
-    mkdir -p ${working_dir}/data/processed
+    mkdir -p ${cwd}/data/processed
     for split in ${splits}; do
-        mkdir -p ${working_dir}/data/processed/${split}
+        mkdir -p ${cwd}/data/processed/${split}
         echo "writing ${split}-16k to ${datadest}"
-        python ${working_dir}/utils/resample.py \
+        python ${cwd}/utils/resample.py \
             --tag ${split} \
             --release ${release} \
-            --database ${working_dir}/data \
-            --datadest ${working_dir}/data/processed/${split} \
+            --database ${cwd}/data \
+            --datadest ${cwd}/data/processed/${split} \
             --sr 16000
     done
 fi
@@ -34,7 +35,7 @@ if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
     mkdir -p ${manifest_dir}
     for split in ${splits}; do
         echo "writing ${release}-${split}.tsv to ${manifest_dir}/${splits}"
-        python ${working_dir}/utils/generate_tsv.py \
+        python ${cwd}/utils/generate_tsv.py \
             --tag ${split} \
             --datadest ${datadest} \
             --manifest-dir ${manifest_dir}
@@ -47,7 +48,7 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
     for split in ${splits}; do
         echo "writing ${split}.origin.wrd to ${manifest_dir}"
         echo "prerequisite: install nemo_text_processing"
-        python ${working_dir}/utils/generate_wrd.py \
+        python ${cwd}/utils/generate_wrd.py \
                 --tag ${split} \
                 --datadest ${datadest} \
                 --manifest-dir ${manifest_dir}/${manifest_tag}
