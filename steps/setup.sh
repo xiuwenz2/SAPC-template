@@ -11,11 +11,13 @@ cwd=$(pwd)
 
 if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
     echo "Stage 0: build conda environment..."
+    
     if [ -n "```conda env list | grep -w "${PYTHON_VIRTUAL_ENVIRONMENT}"```" ]; then
         echo "Environment ${PYTHON_VIRTUAL_ENVIRONMENT} already exists."
     else
         conda create --name ${PYTHON_VIRTUAL_ENVIRONMENT} python=3.9 -y
     fi
+    
 fi
 
 conda activate ${PYTHON_ENVIRONMENT_NAME}
