@@ -1,7 +1,7 @@
 #!/bin/bash
 
 stage=0
-stop_stage=0
+stop_stage=2
 
 usr=???
 source /home/${usr}/.bashrc
@@ -18,12 +18,11 @@ if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
     mkdir -p ${cwd}/data/processed
     for split in ${splits}; do
         mkdir -p ${cwd}/data/processed/${split}
-        echo "writing ${split}-16k to ${datadest}"
+        echo "writing ${split}-16k to ${cwd}/data/processed/${split}"
         python ${cwd}/utils/resample.py \
-            --tag ${split} \
+            --split ${split} \
             --release ${release} \
             --database ${cwd}/data \
-            --datadest ${cwd}/data/processed/${split} \
             --sr 16000
     done
 fi
@@ -31,13 +30,13 @@ fi
 ## run stage 1
 if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
     echo "Stage 1: Generate .tsv manifest..."
-    mkdir -p ${manifest_dir}
+    mkdir -p ${cwd}/manifest
     for split in ${splits}; do
-        echo "writing ${release}-${split}.tsv to ${manifest_dir}/${splits}"
+        echo "writing ${split}.tsv to ${cwd}/manifest"
         python ${cwd}/utils/generate_tsv.py \
-            --tag ${split} \
-            --datadest ${datadest} \
-            --manifest-dir ${manifest_dir}
+            --split ${split} \
+            --data-dir ${cwd}/data/processed \
+            --manifest-dir ${cwd}/manifest
     done
 fi
 
@@ -46,7 +45,6 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
     echo "Stage 2: Generate .wrd label..."
     for split in ${splits}; do
         echo "writing ${split}.origin.wrd to ${manifest_dir}"
-        echo "prerequisite: install nemo_text_processing"
         python ${cwd}/utils/generate_wrd.py \
                 --tag ${split} \
                 --datadest ${datadest} \
