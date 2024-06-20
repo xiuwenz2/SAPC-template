@@ -14,36 +14,33 @@ import soundfile as sf
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--tag", default="dev", type=str, metavar="TAG", help="name of split"
+        "--split", default="dev", type=str, metavar="SPLIT", help="split"
     )
     parser.add_argument(
         "--release", default="???", type=str, metavar="DATADEST", help="release of the dataset"
     )
     parser.add_argument(
-        "--database", default="???", metavar="DATABASE", help="root directory containing wav files to index"
-    )
-    parser.add_argument(
-        "--datadest", default="???", type=str, metavar="DATADEST", help="dest directory containing new wav files to index"
+        "--database", default="???", metavar="DATABASE", help="data dir"
     )
     parser.add_argument(
         "--sr", default=16000, type=int, metavar="SAMPLERATE", help="ideal sample rate"
     )
     return parser
 
-def get_fn(database, release, tag):
+def get_fn(database, release, split):
     with open(
         os.path.join(database, "doc", "SpeechAccessibility_"+release+"_Split_by_Contributors.json"), 'r'
     ) as f:
-        for contributor in json.load(f)[tag]:
-            for _, _, files in os.walk(os.path.join(database, contributor)):
+        for contributor in json.load(f)[split]:
+            for _, _, files in os.walk(os.path.join(database, "raw", contributor)):
                 for file in files:
                     if not file.endswith(".wav"):
                         continue
-                    yield os.path.join(database, contributor, file)
+                    yield os.path.join(database, "raw", contributor, file)
 
 def main(args):
-    for fname in get_fn(args.database, args.release, args.tag):
-        targ_path = os.path.join(args.datadest, args.tag, fname.split("/")[-1])
+    for fname in get_fn(args.database, args.release, args.split):
+        targ_path = os.path.join(args.database, "processed", args.split, fname.split("/")[-1])
         if os.path.exists(targ_path):
             continue
         data, sr = sf.read(fname)
@@ -53,7 +50,7 @@ def main(args):
             try:
                 data = librosa.resample(data, orig_sr=sr, target_sr=args.sr)
             except:
-                print("Skipping", fname)
+                print("Skip", fname)
                 continue
         sf.write(targ_path, data, args.sr)
 

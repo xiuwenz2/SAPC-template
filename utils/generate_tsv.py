@@ -14,22 +14,22 @@ import soundfile as sf
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--tag", default="dev", type=str, metavar="TAG", help="name of split"
+        "--split", default="dev", type=str, metavar="SPLIT", help="split"
     )
     parser.add_argument(
-        "--datadest", default="/home/xiuwenz2/SpeechAcc/data/2023-10-05", type=str, metavar="DATADEST", help="dest directory containing new wav files to index"
+        "--data-dir", default="???", type=str, metavar="DATA-DIR", help="data dir containing processed wav files to index"
     )
     parser.add_argument(
-        "--manifest-dir", default="/home/xiuwenz2/SpeechAcc/level-class/manifest/2023-10-05", metavar="MANIFEST-DIR", help="manifest directory containing .tsv files"
+        "--manifest-dir", default="???", metavar="MANIFEST-DIR", help="manifest directory containing .tsv files"
     )
     return parser
 
 def main(args):
-    with open(os.path.join(args.manifest_dir, args.tag + ".tsv"), "w") as fout:
-        print("{}".format(os.path.join(args.manifest_dir, args.tag)), file=fout)
-        for root, _, files in os.walk(os.path.join(args.datadest, args.tag)):
+    with open(os.path.join(args.manifest_dir, args.split + ".tsv"), "w") as fout:
+        print("{}".format(os.path.join(args.manifest_dir, args.split)), file=fout)
+        for root, _, files in os.walk(os.path.join(args.data_dir, args.split)):
             for file in files:
-                fname = os.path.join(args.datadest, args.tag, file)
+                fname = os.path.join(args.data_dir, args.split, file)
                 frames = sf.info(fname).frames
                 print("{}\t{}".format(fname, frames), file=fout)
 
