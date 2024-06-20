@@ -9,7 +9,6 @@ PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/sapc
 conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
 
 cwd=$(pwd)
-working_dir=${cwd}
 release=2024-04-30
 splits="train dev test"
 
