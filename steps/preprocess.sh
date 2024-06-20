@@ -5,7 +5,7 @@ stop_stage=0
 
 usr=???
 source /home/${usr}/.bashrc
-PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/SAPC
+PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/sapc
 conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
 
 cwd=$(pwd)
