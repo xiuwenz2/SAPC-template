@@ -26,6 +26,7 @@ if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
     python -m pip install soundfile ### soundfile==0.12.1
     python -m pip install numpy==1.23.4 scipy==1.10.1 numba==0.57.1
     python -m pip install librosa ### librosa==0.9.1
+    python -m pip install pydub ### pydub==0.25.1
     python -m pip install nemo_text_processing ### nemo_text_processing==1.0.2
     cd ${cwd}
 fi
