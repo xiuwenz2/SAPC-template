@@ -25,7 +25,7 @@ def get_parser():
     return parser
 
 def main(args):
-    with open(os.path.join(args.manifest_dir, args.split + ".tsv"), "w") as fout:
+    with open(os.path.join(args.manifest_dir, args.split + ".origin.tsv"), "w") as fout:
         print("{}".format(os.path.join(args.manifest_dir, args.split)), file=fout)
         for root, _, files in os.walk(os.path.join(args.data_dir, args.split)):
             for file in files:
