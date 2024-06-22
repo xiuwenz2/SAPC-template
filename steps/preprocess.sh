@@ -29,7 +29,7 @@ fi
 
 ## run stage 1
 if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
-    echo "Stage 1: Generate .tsv manifest..."
+    echo "Stage 1: Generate .origin.tsv manifest..."
     mkdir -p ${cwd}/manifest
     for split in ${splits}; do
         echo "writing ${split}.tsv to ${cwd}/manifest"
