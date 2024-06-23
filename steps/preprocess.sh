@@ -3,9 +3,9 @@
 stage=1
 stop_stage=1
 
-usr=xiuwenz2
+usr=???
 source /home/${usr}/.bashrc
-PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/wav2vec
+PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/sapc
 conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
 
 cwd=$(pwd)
