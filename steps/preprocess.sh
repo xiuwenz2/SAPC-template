@@ -10,8 +10,7 @@ conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
 
 cwd=$(pwd)
 release=2024-04-30
-# splits="train dev test"
-splits="dev test"
+splits="train dev test"
 
 ## run stage 0
 if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
