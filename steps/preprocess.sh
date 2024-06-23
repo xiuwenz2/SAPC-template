@@ -1,7 +1,7 @@
 #!/bin/bash
 
-stage=1
-stop_stage=1
+stage=0
+stop_stage=2
 
 usr=???
 source /home/${usr}/.bashrc
