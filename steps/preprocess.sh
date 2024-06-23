@@ -42,17 +42,11 @@ fi
 
 ## run stage 2
 if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
-    echo "Stage 2: Generate .wrd label..."
+    echo "Stage 2: Normalize .wrd label..."
     for split in ${splits}; do
-        echo "writing ${split}.origin.wrd && ${split}.tsv to ${cwd}/manifest"
-        python ${cwd}/utils/generate_origin_wrd.py \
+        echo "writing ${split}.wrd to ${cwd}/manifest"
+        python ${cwd}/utils/normalize_wrd.py \
                 --split ${split} \
-                --data-dir ${cwd}/data/processed \
                 --manifest-dir ${cwd}/manifest
-#         echo "writing ${split}.wrd to ${cwd}/manifest"
-#         python ${cwd}/utils/generate_wrd.py \
-#                 --tag ${split} \
-#                 --data-dir ${datadest} \
-#                 --manifest-dir ${cwd}/manifest/${split}
     done   
 fi
