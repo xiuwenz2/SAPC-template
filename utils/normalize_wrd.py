@@ -15,7 +15,7 @@ PUNC = r"[。─()-<>！？｡\"＂＃＄％＆＇（）＊＋，－-／/：；�
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--split", default="dev", type=str, metavar="TAG", help="name of split"
+        "--split", default="dev", type=str, metavar="SPLIT", help="name of split"
     )
     parser.add_argument(
         "--manifest-dir", default="/home/xiuwenz2/SpeechAcc/fine-tune/manifest/2023-10-05", metavar="MANIFEST-DIR", help="manifest directory containing .tsv files"
@@ -25,9 +25,9 @@ def get_parser():
 def main(args):
     normalizer = Normalizer(input_case='cased', lang='en')
     with open(
-        os.path.join(args.manifest_dir, args.tag+".origin.wrd"), "r"
+        os.path.join(args.manifest_dir, args.split+".origin.wrd"), "r"
     ) as fin, open(
-        os.path.join(args.manifest_dir, args.tag+".wrd"), "w"
+        os.path.join(args.manifest_dir, args.split+".wrd"), "w"
     ) as fout:
         for item in tqdm(fin.readlines()):
             trans = item.strip()
