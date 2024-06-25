@@ -8,24 +8,28 @@ Write something here
 
 ```plaintext
 /DatasetDownload
- ### Audio files
+
+ ### Audio files ###
  ┣ SpeechAccessibility_2024-04-30_000.7z
  ┣ SpeechAccessibility_2024-04-30_001.7z
  ┣ ...
  ┣ SpeechAccessibility_2024-04-30_011.7z
- ### Json files (per spk)
+
+ ### Json files I (per spk) ###
  ┣ SpeechAccessibility_2024-04-30_Only_Json.7z
- ### Json files (overall)
+
+ ### Json files II (overall) ###
  ┣ SpeechAccessibility_2024-04-30_Split.json
  ┣ SpeechAccessibility_2024-04-30_Split_by_Contributors.json
  ┣ SpeechAccessibility_2024-04-30_Dimension_Category_Description.json
- ### Json files (mismatch check)
+
+ ### Json files III (mismatch check) ###
  ┣ SpeechAccessibility_2024-04-30_Check_Brackets.json
  ┣ SpeechAccessibility_2024-04-30_Check_Normalization.json
  ┣ SpeechAccessibility_2024-04-30_Check_Abbreviations.json
  ┣ SpeechAccessibility_2024-04-30_Check_WordErrorRate.json
 ```
 
-* Unzip the data package using ```bash steps/unzip.sh```.
+* Unzip the data package using ```bash steps/unzip.sh```, from ```/DatasetDownload``` into ```/data```.
 * Build conda environment using ```bash steps/setup.sh```.
 * Preprocess the data using ```bash steps/preprocess.sh```.
