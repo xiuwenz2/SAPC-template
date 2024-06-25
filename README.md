@@ -9,27 +9,55 @@ Write something here
 ```plaintext
 /DatasetDownload
 
- ### Audio files ###
- ┣ SpeechAccessibility_2024-04-30_000.7z
- ┣ SpeechAccessibility_2024-04-30_001.7z
+ ### Audio Files ###
+ ┣ SpeechAccessibility_{release}_000.7z
+ ┣ SpeechAccessibility_{release}_001.7z
  ┣ ...
- ┣ SpeechAccessibility_2024-04-30_011.7z
+ ┣ SpeechAccessibility_{release}_011.7z
 
- ### Json files I (per spk) ###
- ┣ SpeechAccessibility_2024-04-30_Only_Json.7z
+ ### Json Files I (per spk) ###
+ ┣ SpeechAccessibility_{release}_Only_Json.7z
 
- ### Json files II (overall) ###
- ┣ SpeechAccessibility_2024-04-30_Split.json
- ┣ SpeechAccessibility_2024-04-30_Split_by_Contributors.json
- ┣ SpeechAccessibility_2024-04-30_Dimension_Category_Description.json
+ ### Json Files II (overall) ###
+ ┣ SpeechAccessibility_{release}_Split.json
+ ┣ SpeechAccessibility_{release}_Split_by_Contributors.json
+ ┣ SpeechAccessibility_{release}_Dimension_Category_Description.json
 
- ### Json files III (mismatch check) ###
- ┣ SpeechAccessibility_2024-04-30_Check_Brackets.json
- ┣ SpeechAccessibility_2024-04-30_Check_Normalization.json
- ┣ SpeechAccessibility_2024-04-30_Check_Abbreviations.json
- ┣ SpeechAccessibility_2024-04-30_Check_WordErrorRate.json
+ ### Json Files III (mismatch check) ###
+ ┣ SpeechAccessibility_{release}_Check_Brackets.json
+ ┣ SpeechAccessibility_{release}_Check_Normalization.json
+ ┣ SpeechAccessibility_{release}_Check_Abbreviations.json
+ ┣ SpeechAccessibility_{release}_Check_WordErrorRate.json
 ```
 
-* Unzip the data package using ```bash steps/unzip.sh```, from ```/DatasetDownload``` into ```/data```.
+* Unzip the data package using ```bash steps/unzip.sh```, from ```/DatasetDownload``` into ```/data``` with the file structure as follows.
+```plaintext
+/data
+
+### Raw Audio Files ###
+┣ raw
+┃ ┣ {spk_id_1}
+┃ ┃ ┣ {spk_id_1}_{utt_id_1}_xxxx.wav
+┃ ┃ ┣ {spk_id_1}_{utt_id_2}_xxxx.wav
+┃ ┃ ┣ ...
+┃ ┃ ┣ {spk_id_1}.json
+┃ ┣ {spk_id_2}
+┃ ┣ ...
+### Json Files ###
+┣ doc
+┃ ┣ {spk_id_1}.json
+┃ ┣ {spk_id_2}.json
+┃ ┣ ...
+┃
+┃ ┣ SpeechAccessibility_{release}_Split.json
+┃ ┣ SpeechAccessibility_{release}_Split_by_Contributors.json
+┃ ┣ SpeechAccessibility_{release}_Dimension_Category_Description.json
+┃
+┃ ┣ SpeechAccessibility_{release}_Check_Brackets.json
+┃ ┣ SpeechAccessibility_{release}_Check_Normalization.json
+┃ ┣ SpeechAccessibility_{release}_Check_Abbreviations.json
+┃ ┣ SpeechAccessibility_{release}_Check_WordErrorRate.json
+```
+
 * Build conda environment using ```bash steps/setup.sh```.
 * Preprocess the data using ```bash steps/preprocess.sh```.
