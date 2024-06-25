@@ -29,7 +29,7 @@ Write something here
  ┣ SpeechAccessibility_{release}_Check_Abbreviations.json
  ┣ SpeechAccessibility_{release}_Check_WordErrorRate.json
 ```
-
+* Build conda environment using ```bash steps/setup.sh```.
 * Unzip the data package using ```bash steps/unzip.sh```, from ```/DatasetDownload``` into ```/data``` with the file structure as follows.
 ```plaintext
 /data
@@ -58,6 +58,4 @@ Write something here
 ┃ ┣ SpeechAccessibility_{release}_Check_Abbreviations.json
 ┃ ┣ SpeechAccessibility_{release}_Check_WordErrorRate.json
 ```
-
-* Build conda environment using ```bash steps/setup.sh```.
 * Preprocess the data using ```bash steps/preprocess.sh```.
