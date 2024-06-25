@@ -33,7 +33,7 @@ def main(args):
             trans = item.strip()
             
             # change "\’" & "\‘" back to "\'"
-            trans = re.sub(r"[\’\‘]", r"\'", trans)
+            trans = re.sub(r"[\’\‘]", r"'", trans)
             
             # remove "[...]" by removing them
             ### trans = re.sub(u"\\[.*?] ", "", trans)
