@@ -62,7 +62,8 @@ Write something here
 ```
 * Preprocess the data using ```bash steps/preprocess.sh```.
 ```plaintext
-## run stage 0
+### run stage 0: audio resampling to 16k Hz (default), with processed audio files written as follows.
+
 /data
 
 ### Raw Audio Files ###
