@@ -43,19 +43,37 @@ Write something here
 ┃ ┃ ┣ {spk_id_1}.json
 ┃ ┣ {spk_id_2}
 ┃ ┣ ...
+
 ### Json Files ###
 ┣ doc
+┃ ### per spk ###
 ┃ ┣ {spk_id_1}.json
 ┃ ┣ {spk_id_2}.json
 ┃ ┣ ...
-┃
+┃ ### per spk ###
 ┃ ┣ SpeechAccessibility_{release}_Split.json
 ┃ ┣ SpeechAccessibility_{release}_Split_by_Contributors.json
 ┃ ┣ SpeechAccessibility_{release}_Dimension_Category_Description.json
-┃
+┃ ### per spk ###
 ┃ ┣ SpeechAccessibility_{release}_Check_Brackets.json
 ┃ ┣ SpeechAccessibility_{release}_Check_Normalization.json
 ┃ ┣ SpeechAccessibility_{release}_Check_Abbreviations.json
 ┃ ┣ SpeechAccessibility_{release}_Check_WordErrorRate.json
 ```
 * Preprocess the data using ```bash steps/preprocess.sh```.
+```plaintext
+## run stage 0
+/data
+
+### Raw Audio Files ###
+┣ processed
+┃ ┣ train
+┃ ┃ ┣ {train_spk_id_1}_{utt_id_1}_xxxx.wav
+┃ ┃ ┣ ...
+┃ ┣ dev
+┃ ┃ ┣ {dev_spk_id_1}_{utt_id_1}_xxxx.wav
+┃ ┃ ┣ ...
+┃ ┣ test
+┃ ┃ ┣ {test_spk_id_1}_{utt_id_1}_xxxx.wav
+┃ ┃ ┣ ...
+```
