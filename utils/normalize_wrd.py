@@ -10,7 +10,7 @@ Data pre-processing: text normalization, .origin.wrd to .wrd.
 import argparse, os, re
 from tqdm import tqdm
 from nemo_text_processing.text_normalization.normalize import Normalizer
-PUNC = r"[。─()-<>！？｡\"＂＃＄％＆＇（）＊＋，－-／/：；＜＝＞＠［＼］＾＿｀｛｜｝\[\]{～}｟｠｢｣､、〃《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏.,:?~!]"
+PUNC = r"[─()-<>\"-/\[\]{}｢｣､〜〰–—‛“”„‟…‧﹏.,:?~!]"
 
 def get_parser():
     parser = argparse.ArgumentParser()
@@ -18,7 +18,7 @@ def get_parser():
         "--split", default="dev", type=str, metavar="SPLIT", help="name of split"
     )
     parser.add_argument(
-        "--manifest-dir", default="/home/xiuwenz2/SpeechAcc/fine-tune/manifest/2023-10-05", metavar="MANIFEST-DIR", help="manifest directory containing .tsv files"
+        "--manifest-dir", default="???", metavar="MANIFEST-DIR", help="manifest directory containing .tsv files"
     )
     return parser
 
@@ -33,20 +33,7 @@ def main(args):
             trans = item.strip()
             
             # change "\’" & "\‘" back to "\'"
-            trans = re.sub(r"[\’\‘]", r"[\']", trans)
-            
-            # remove "*", "~" before nemo_text_processing
-            trans = re.sub(r"[\*\~]", " ", trans)
-            
-            # nemo_text_processing
-            trans = normalizer.normalize(trans, verbose=False, punct_post_process=True)
-            
-            # normalize unusual email addresses
-            content = re.findall("@", trans)
-            if len(content) > 0:
-                content = [re.sub("\.", " dot ", con[:-1])+con[-1] for con in trans.split()]
-                trans = " ".join(content)
-                trans = re.sub("@", " at ", trans)
+            trans = re.sub(r"[\’\‘]", r"\'", trans)
             
             # remove "[...]" by removing them
             ### trans = re.sub(u"\\[.*?] ", "", trans)
@@ -60,17 +47,42 @@ def main(args):
             # process "{...}" by replacing unknown words and retaining uncertain words
             content = re.findall("\{(.*?)\}", trans)
             if len(content) > 0:
-                content_ = ["UNK" if ((re.findall("(.+(?=:))", con) and (re.findall("(.+(?=:))", con)[0]=="w" or re.findall("(.+(?=:))", con)[0]=="u")) or con==" ") else re.sub("(.+(?=:))", " ", con) for con in content]
+                content_ = []
+                for con in content:
+                    if re.findall("(.+(?=:))", con) and re.findall("(.+(?=:))", con)[0]=="w":
+                        assert len(re.findall(r"\d+", con)) == 1
+                        num_unk = int(re.findall(r"\d+", con)[0])
+                        content_.append(" ".join(["UNK" for i in range(num_unk)]))
+                    elif (re.findall("(.+(?=:))", con) and re.findall("(.+(?=:))", con)[0]=="u") or con==" ":
+                        content_.append(" ".join(["UNK" for i in range(1)]))
+                    else:
+                        content_.append(re.sub("(.+(?=:))", " ", con))
                 mapping = {content[i]:re.sub(":", " ", content_[i]) for i in range(len(content))}
                 trans = re.sub("\{(.*?)\}", lambda x: "{"+mapping[x.group()[1:-1]]+"}", trans)
+                
+            # remove "*", "~" before nemo_text_processing
+            trans = re.sub(r"[\*\~]", " ", trans)
+            
+            # nemo_text_processing
+            trans = ' '.join(trans.strip().split()) ### remove extra space
+            trans = normalizer.normalize(trans, verbose=False, punct_post_process=True)
+            
+            # normalize unusual email addresses
+            content = re.findall("@", trans)
+            if len(content) > 0:
+                content = [re.sub("\.", " dot ", con[:-1])+con[-1] for con in trans.split()]
+                trans = " ".join(content)
+                trans = re.sub("@", " at ", trans)
             
             ### the manual replacement part fill in here...
-            ### including mismatch caused by the normalizer, mismatch of the brackets, utt with abnormal WER...
+            ### including mismatch caused by the normalizer, mismatch of the brackets, utt with abnormal WER, M.P. issue...
             
-            # process "(...)" by removing them
+            # process "(...)" by removing them while keeping "(cs:...)"
             content = re.findall("\((.*?)\)", trans)
             if len(content) > 0:
-                trans = re.sub("\((.*?)\)", " ", trans)
+                content_ = [re.sub("(.+(?=:))", " ", con) if re.findall("(.+(?=:))", con) else "" for con in content]
+                mapping = {content[i]:re.sub(":", " ", content_[i]) for i in range(len(content))}
+                trans = re.sub("\((.*?)\)", lambda x: mapping[x.group()[1:-1]], trans)
 #                 trans = re.sub("\((.*?)\)", lambda x: "("+re.sub("(.+(?=:))", " ", x.group()[1:-1])+")", trans) ### this rule keeps "(...)" rather than removing them
             
             # remove punc except "\'"
