@@ -77,7 +77,7 @@ Write something here
         
       ```plaintext  
       ### run stage 0: Resampling audio files to 16k Hz (default), with processed audio files written as follows.
-      
+
       /data
       
       ### Processed Audio Files ###
@@ -115,25 +115,6 @@ Write something here
 
       <details>
         
-      <summary>Manifest Generation</summary>
-        
-      ```plaintext  
-      ### run stage 1: Generating preliminary wav2vec-like manifest to /manifest, with file struction as follows.
-      
-      /manifest
-      
-      ### Manifest Files ###
-      ┣ train.tsv
-      ┣ train.origin.wrd
-      ┣ test.tsv
-      ┣ test.origin.wrd
-      ┣ dev.tsv
-      ┣ dev.origin.wrd
-      ```
-      </details>
-
-      <details>
-        
       <summary>Manifest Normalization</summary>
         
       ```plaintext  
@@ -145,5 +126,20 @@ Write something here
       ┣ train.wrd
       ┣ test.wrd
       ┣ dev.wrd
+      ```
+
+      ```plaintext  
+      Normalization rules are listed as follows.
+      
+      + change "\’" & "\‘" back to "\'".
+      + process "[...]": remove words within square brackets "[...]".
+      + process "{...}": change uncertain words within curly brackets "{...}" to "UNK" except keeping human-guessed ones "{g:...}".
+      + remove "*", "~" before nemo_text_processing.
+      + nemo_text_processing for basic text normalization, including digital numbers, abbreviations, and special punctuations.
+      + update transcription manually to solve the mismatch issues caused by annotation and/or text normalization, by checking brackets, numbers, abbrevations, word error rates, and confidence scores.
+      + process "(...)": remove words within brackets "(...)" except keeping code switching ones "(cs:...)".
+      + remove punctuations except "\'" within words.
+      + change to upper case.
+      + remove extra space.
       ```
       </details>
