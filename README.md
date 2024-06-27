@@ -99,7 +99,7 @@ Write something here
       <summary>Manifest Generation</summary>
         
       ```plaintext  
-      ### run stage 1: Generating preliminary manifest to /manifest, with file struction as follows.
+      ### run stage 1: Generating preliminary wav2vec-like manifest to /manifest, with file struction as follows.
       
       /manifest
       
@@ -110,5 +110,40 @@ Write something here
       ┣ test.origin.wrd
       ┣ dev.tsv
       ┣ dev.origin.wrd
+      ```
+      </details>
+
+      <details>
+        
+      <summary>Manifest Generation</summary>
+        
+      ```plaintext  
+      ### run stage 1: Generating preliminary wav2vec-like manifest to /manifest, with file struction as follows.
+      
+      /manifest
+      
+      ### Manifest Files ###
+      ┣ train.tsv
+      ┣ train.origin.wrd
+      ┣ test.tsv
+      ┣ test.origin.wrd
+      ┣ dev.tsv
+      ┣ dev.origin.wrd
+      ```
+      </details>
+
+      <details>
+        
+      <summary>Manifest Normalization</summary>
+        
+      ```plaintext  
+      ### run stage 2: Normalizing manifest in a wav2vec-like manner, with file struction as follows.
+      
+      /manifest
+      
+      ### Manifest Files ###
+      ┣ train.wrd
+      ┣ test.wrd
+      ┣ dev.wrd
       ```
       </details>
