@@ -137,7 +137,7 @@ Write something here
       + remove "*", "~" before nemo_text_processing.
       + nemo_text_processing for basic text normalization, including digital numbers, abbreviations, and special punctuations.
       + update transcription manually to solve the mismatch issues caused by annotation and/or text normalization, by checking brackets, numbers, abbrevations, word error rates, and confidence scores.
-      + process "(...)": remove words within brackets "(...)" except keeping code switching ones "(cs:...)".
+      + process "(...)": remove words within brackets "(...)" except keeping ones with prefix, like "(cs:...)", "(assistant:...)".
       + remove punctuations except "\'" within words.
       + change to upper case.
       + remove extra space.
