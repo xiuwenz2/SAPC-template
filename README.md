@@ -58,11 +58,11 @@ Write something here
       ┃ ┣ {spk_id_1}.json
       ┃ ┣ {spk_id_2}.json
       ┃ ┣ ...
-      ┃ ### per spk ###
+      ┃ ### overall ###
       ┃ ┣ SpeechAccessibility_{release}_Split.json
       ┃ ┣ SpeechAccessibility_{release}_Split_by_Contributors.json
       ┃ ┣ SpeechAccessibility_{release}_Dimension_Category_Description.json
-      ┃ ### per spk ###
+      ┃ ### mismatch check ###
       ┃ ┣ SpeechAccessibility_{release}_Check_Brackets.json
       ┃ ┣ SpeechAccessibility_{release}_Check_Normalization.json
       ┃ ┣ SpeechAccessibility_{release}_Check_Abbreviations.json
