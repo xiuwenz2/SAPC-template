@@ -76,11 +76,11 @@ Write something here
       <summary>Audio Resampling</summary>
         
       ```plaintext  
-      ### run stage 0: audio resampling to 16k Hz (default), with processed audio files written as follows.
+      ### run stage 0: Resampling audio files to 16k Hz (default), with processed audio files written as follows.
       
       /data
       
-      ### Raw Audio Files ###
+      ### Processed Audio Files ###
       ┣ processed
       ┃ ┣ train
       ┃ ┃ ┣ {train_spk_id_1}_{utt_id_1}_xxxx.wav
@@ -91,5 +91,24 @@ Write something here
       ┃ ┣ test
       ┃ ┃ ┣ {test_spk_id_1}_{utt_id_1}_xxxx.wav
       ┃ ┃ ┣ ...
+      ```
+      </details>
+
+      <details>
+        
+      <summary>Manifest Generation</summary>
+        
+      ```plaintext  
+      ### run stage 1: Generating preliminary manifest to /manifest, with file struction as follows.
+      
+      /manifest
+      
+      ### Manifest Files ###
+      ┣ train.tsv
+      ┣ train.origin.wrd
+      ┣ test.tsv
+      ┣ test.origin.wrd
+      ┣ dev.tsv
+      ┣ dev.origin.wrd
       ```
       </details>
