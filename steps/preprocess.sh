@@ -47,6 +47,7 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
         echo "writing ${split}.wrd to ${cwd}/manifest"
         python ${cwd}/utils/normalize_wrd.py \
                 --split ${split} \
-                --manifest-dir ${cwd}/manifest
+                --manifest-dir ${cwd}/manifest \ 
+                --with-parentheses
     done   
 fi
