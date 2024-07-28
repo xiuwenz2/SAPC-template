@@ -1,16 +1,17 @@
 #!/bin/bash
 
-stage=0
+stage=2
 stop_stage=2
 
-usr=???
+usr=xiuwenz2
 source /home/${usr}/.bashrc
-PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/sapc
+PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/wav2vec
 conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
 
 cwd=$(pwd)
 release=2024-04-30
 splits="train dev test"
+# splits="dev"
 
 ## run stage 0
 if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
@@ -47,7 +48,9 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
         echo "writing ${split}.wrd to ${cwd}/manifest"
         python ${cwd}/utils/normalize_wrd.py \
                 --split ${split} \
-                --manifest-dir ${cwd}/manifest \ 
+                --release ${release} \
+                --doc-dir ${cwd}/data/doc \
+                --manifest-dir ${cwd}/manifest \
                 --with-parentheses
     done   
 fi
