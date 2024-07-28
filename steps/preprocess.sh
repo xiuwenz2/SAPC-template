@@ -1,6 +1,6 @@
 #!/bin/bash
 
-stage=2
+stage=0
 stop_stage=2
 
 usr=xiuwenz2
