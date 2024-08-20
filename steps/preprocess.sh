@@ -3,15 +3,14 @@
 stage=0
 stop_stage=2
 
-usr=xiuwenz2
+usr=???
 source /home/${usr}/.bashrc
-PYTHON_VIRTUAL_ENVIRONMENT=/home/${usr}/.conda/envs/wav2vec
+PYTHON_VIRTUAL_ENVIRONMENT=sapc
 conda activate ${PYTHON_VIRTUAL_ENVIRONMENT}
 
 cwd=$(pwd)
 release=2024-04-30
-splits="train dev test"
-# splits="dev"
+splits="train dev test1 test2"
 
 ## run stage 0
 if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
@@ -36,7 +35,8 @@ if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
         echo "writing ${split}.tsv && ${split}.origin.wrd to ${cwd}/manifest"
         python ${cwd}/utils/generate_manifest.py \
             --split ${split} \
-            --data-dir ${cwd}/data/processed \
+            --release ${release} \
+            --data-dir ${cwd}/data \
             --manifest-dir ${cwd}/manifest
     done
 fi
@@ -49,8 +49,8 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
         python ${cwd}/utils/normalize_wrd.py \
                 --split ${split} \
                 --release ${release} \
-                --doc-dir ${cwd}/data/doc \
+                --data-dir ${cwd}/data \
                 --manifest-dir ${cwd}/manifest \
-                --with-parentheses
+                --remove-parentheses
     done   
 fi

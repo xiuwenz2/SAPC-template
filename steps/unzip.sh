@@ -1,4 +1,4 @@
-#!bin/sh
+#!/bin/bash
 
 stage=0
 stop_stage=1
