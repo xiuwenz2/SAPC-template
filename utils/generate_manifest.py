@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # By xiuwenz2@illinois.edu, July.28, 2024.
-#
-# This source code is licensed under the MIT license found in the
-# LICENSE file in the root directory of this source tree.
 """
 Data pre-processing: generate .tsv and .origin.wrd manifest.
 """
@@ -19,7 +16,10 @@ def get_parser():
         "--split", default="dev", type=str, metavar="SPLIT", help="split"
     )
     parser.add_argument(
-        "--data-dir", default="???", type=str, metavar="DATA-DIR", help="data dir containing processed wav files to index"
+        "--release", default="???", type=str, metavar="DATADEST", help="release of the dataset"
+    )
+    parser.add_argument(
+        "--data-dir", default="???", type=str, metavar="DATA-DIR", help="data dir"
     )
     parser.add_argument(
         "--manifest-dir", default="???", metavar="MANIFEST-DIR", help="manifest directory containing .tsv files"
@@ -39,44 +39,64 @@ def generate_content(content, doc_pt, ):
                     continue
     return content
 
-def process_timesteps(fpt, trans):
+def process_timestamps(fpt, trans):
     trans = re.sub(u"\\[.*?]", "", trans).strip()
-    timestamps = trans.split('\n')[1:]
-        
-    audio = AudioSegment.from_wav(fpt)
-    combined = AudioSegment.empty()
+    timestamps = trans.strip().split('\n')[1:]
+    
+    duration = 0
     transcriptions = []
     
     for timestamp in timestamps:
+        if timestamp == " ":
+            continue
         ts_ls = timestamp.strip().split()
-        start_time = float(ts_ls[0].strip()) * 1000  
-        end_time = float(ts_ls[1].strip()) * 1000 
-
-        segment = audio[start_time:end_time]
-        combined += segment
+        duration += (float(ts_ls[1].strip()) - float(ts_ls[0].strip()))
         transcriptions.append(" ".join(ts_ls[2:]))
-
-    output_file_final_root = fpt.split(".")[0]+"_processed_ts.wav"
-    combined.export(output_file_final_root, format="wav")
-                
-    return " ".join(transcriptions), "{}\t{}".format(output_file_final_root, sf.info(output_file_final_root).frames)
+    
+    if abs(round(duration, 2) - round(sf.info(fpt).duration, 2)) <= 0.02:
+        # print("Timestamps are already processed for", fpt)
+        return " ".join(transcriptions), "{}\t{}".format(fpt, sf.info(fpt).frames)
+        
+    audio = AudioSegment.from_wav(fpt)
+    combined = AudioSegment.empty() 
+    
+    for timestamp in timestamps:
+        if timestamp == " ":
+            continue
+        ts_ls = timestamp.strip().split()
+        start_time = float(ts_ls[0].strip()) * 1000
+        end_time = float(ts_ls[1].strip()) * 1000
+        
+        combined += audio[start_time:end_time]
+    
+    combined.export(fpt, format="wav")
+    
+    return " ".join(transcriptions), "{}\t{}".format(fpt, sf.info(fpt).frames)
             
 def main(args):
-    content = generate_content({}, os.path.join(args.data_dir, "../doc"), )
+    content = generate_content({}, os.path.join(args.data_dir, "doc"), )
+    
+    audio_excluded_dict = json.load(open(os.path.join(args.data_dir, "doc", "SpeechAccessibility_"+args.release+"_Audio_Excluded.json")))
+    
     with open(
         os.path.join(args.manifest_dir, args.split + ".tsv"), "w"
     ) as ftsv, open(
         os.path.join(args.manifest_dir, args.split+".origin.wrd"), "w"
     ) as fwrd:
         print("{}".format(os.path.join(args.manifest_dir, args.split)), file=ftsv)
-        for root, _, files in os.walk(os.path.join(args.data_dir, args.split)):
+        for root, _, files in os.walk(os.path.join(args.data_dir, "processed", args.split)):
             for file in tqdm(files):
-                if file.endswith("_processed_ts.wav"):
+                fname = os.path.join(args.data_dir, "processed", args.split, file)
+                if file in audio_excluded_dict:
+                    print("Skip", file, ", as it is excluded in the new release.")
                     continue
-                fname = os.path.join(args.data_dir, args.split, file)
-                trans = content[file]
+                try:
+                    trans = content[file]
+                except:
+                    print("Skip", file, ", as it is not found in the new release.")
+                    continue
                 if "#ts" in trans:
-                    trans, tsv = process_timesteps(fname, trans)
+                    trans, tsv = process_timestamps(fname, trans)
                 else:
                     trans = re.sub(u"\n", " ", trans)
                     tsv = "{}\t{}".format(fname, sf.info(fname).frames)

@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # By xiuwenz2@illinois.edu, June 23, 2024.
-#
-# This source code is licensed under the MIT license found in the
-# LICENSE file in the root directory of this source tree.
 """
 Data pre-processing: text normalization, .origin.wrd to .wrd.
 """
@@ -21,13 +18,13 @@ def get_parser():
         "--release", default="???", type=str, metavar="DATADEST", help="release of the dataset"
     )
     parser.add_argument(
-        "--doc-dir", default="???", type=str, metavar="DATA-DIR", help="dir containing doc files"
+        "--data-dir", default="???", type=str, metavar="DATA-DIR", help="data dir"
     )
     parser.add_argument(
         "--manifest-dir", default="???", metavar="MANIFEST-DIR", help="manifest directory containing .tsv files"
     )
     parser.add_argument(
-        '--with-parentheses', action='store_true', metavar="WITH-PARENTHESES", help="keeping disfluent parts within paratheses in the transcripts"
+        '--remove-parentheses', action='store_true', help="removing disfluent parts within paratheses in the transcripts"
     )
     return parser
 
@@ -35,15 +32,15 @@ def main(args):
     
     normalizer = Normalizer(input_case='cased', lang='en')                   
     
-    dict_error_correction = json.load(open(os.path.join(args.doc_dir, "SpeechAccessibility_"+args.release+"_"+"Error_Correction.json")))
-    dict_abbreviation_decomposition = json.load(open(os.path.join(args.doc_dir, "SpeechAccessibility_"+args.release+"_"+"Abbreviation_Decomposition.json")))
+    error_correction_dict = json.load(open(os.path.join(args.data_dir, "doc", "SpeechAccessibility_"+args.release+"_Error_Correction.json")))
+    abbreviation_decomposition_dict = json.load(open(os.path.join(args.data_dir, "doc", "SpeechAccessibility_"+args.release+"_Abbreviation_Decomposition.json")))
     
     with open(
         os.path.join(args.manifest_dir, args.split + ".tsv"), "r"
     ) as ftsv, open(
         os.path.join(args.manifest_dir, args.split+".origin.wrd"), "r"
     ) as fin, open(
-        os.path.join(args.manifest_dir, args.split+".postnorm.wrd"), "w"
+        os.path.join(args.manifest_dir, args.split+".wrd"), "w"
     ) as fout:
         next(ftsv)
         for item, t in tqdm(zip(fin.readlines(), ftsv.readlines())):            
@@ -95,11 +92,11 @@ def main(args):
             # fix trans mismatch manually
             ### including mismatch caused by the normalizer, mismatch of brackets, utt with abnormal WER, M.P. issue...
             fname = t.strip().split()[0].split("/")[-1]
-            trans = dict_error_correction[fname].strip() if fname in dict_error_correction else trans
-            trans = dict_abbreviation_decomposition[fname].strip() if fname in dict_abbreviation_decomposition else trans
+            trans = error_correction_dict[fname].strip() if fname in error_correction_dict else trans
+            trans = abbreviation_decomposition_dict[fname].strip() if fname in abbreviation_decomposition_dict else trans
             ### including mismatch caused by the normalizer, mismatch of the brackets, utt with abnormal WER, abbr issues...
             
-            if not args.with_parentheses:
+            if args.remove_parentheses:
                 # process "(...)" by removing them while keeping "(cs:...)"
                 content = re.findall("\((.*?)\)", trans)
                 if len(content) > 0:
@@ -107,7 +104,7 @@ def main(args):
                     mapping = {content[i]:re.sub(":", " ", content_[i]) for i in range(len(content))}
                     trans = re.sub("\((.*?)\)", lambda x: mapping[x.group()[1:-1]], trans)
             else:
-                assert args.with_parentheses is True
+                assert args.remove_parentheses is False
                 trans = re.sub("\((.*?)\)", lambda x: "("+re.sub("(.+(?=:))", " ", x.group()[1:-1])+")", trans) ### this rule keeps "(...)" rather than removing them
             
             # remove punc except "\'"

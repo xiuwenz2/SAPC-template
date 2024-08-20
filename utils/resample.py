@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # By xiuwenz2@illinois.edu, Oct.17, 2023.
-#
-# This source code is licensed under the MIT license found in the
-# LICENSE file in the root directory of this source tree.
 """
 Data pre-processing: resample audios to 16k.
 """
@@ -50,7 +47,7 @@ def main(args):
             try:
                 data = librosa.resample(data, orig_sr=sr, target_sr=args.sr)
             except:
-                print("Skip", fname)
+                print("Skip", fname, ", as it is not in the right format.")
                 continue
         sf.write(targ_path, data, args.sr)
 
