@@ -131,8 +131,8 @@
       + process "{...}": change uncertain words within curly brackets "{...}" to "UNK" except keeping human-guessed ones "{g:...}".
       + remove "*", "~" before nemo_text_processing.
       + nemo_text_processing for basic text normalization, including digital numbers, abbreviations, and special punctuations.
-      + update transcription manually to solve the mismatch issues caused by annotation and/or text normalization, by checking brackets, numbers, abbrevations, word error rates, and confidence scores.
-      + process "(...)": remove words within brackets "(...)" except keeping ones with prefix, like "(cs:...)", "(assistant:...)".
+      + update transcription manually to correct errors and decomposite abbreviations.
+      + process "(...)": set the action attribute **--remove-parentheses** to remove words within parentheses "(...)" except keeping ones with prefix, like "(cs:...)", "(assistant:...)". Otherwise, keep everything within parentheses.
       + remove punctuations except "\'" within words.
       + change to upper case.
       + remove extra space.
