@@ -7,7 +7,7 @@ Data pre-processing: text normalization, .origin.wrd to .wrd.
 import argparse, os, re, json
 from tqdm import tqdm
 from nemo_text_processing.text_normalization.normalize import Normalizer
-PUNC = r"[─()<>\-/\[\]{}｢｣､〜〰–—‛“”„‟…‧﹏.,:?~!\"\+*~]"
+PUNC = r"[─()<>\-/\[\]{}｢｣､〜〰–—‛“”„‟…‧﹏.,:?~!\"\+*~;]"
 
 def get_parser():
     parser = argparse.ArgumentParser()
