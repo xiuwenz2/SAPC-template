@@ -51,6 +51,6 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
                 --release ${release} \
                 --data-dir ${cwd}/data \
                 --manifest-dir ${cwd}/manifest \
-                --remove-parentheses
+                --remove-parentheses # to remove the disfluency part within parentheses
     done   
 fi
