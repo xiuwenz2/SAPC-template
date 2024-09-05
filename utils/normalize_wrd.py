@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # By xiuwenz2@illinois.edu, June 23, 2024.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
 """
 Data pre-processing: text normalization, .origin.wrd to .wrd.
 """
@@ -7,7 +10,7 @@ Data pre-processing: text normalization, .origin.wrd to .wrd.
 import argparse, os, re, json
 from tqdm import tqdm
 from nemo_text_processing.text_normalization.normalize import Normalizer
-PUNC = r"[─()<>\-/\[\]{}｢｣､〜〰–—‛“”„‟…‧﹏.,:?~!\"\+*~;]"
+# PUNC = r"[─()<>\-/\[\]{}｢｣､〜〰–—‛“”„‟…‧﹏.,:?~!\"\+*~;]"
 
 def get_parser():
     parser = argparse.ArgumentParser()
@@ -30,8 +33,7 @@ def get_parser():
 
 def main(args):
     
-    normalizer = Normalizer(input_case='cased', lang='en')                   
-    
+    normalizer = Normalizer(input_case='cased', lang='en')             
     error_correction_dict = json.load(open(os.path.join(args.data_dir, "doc", "SpeechAccessibility_"+args.release+"_Error_Correction.json")))
     abbreviation_decomposition_dict = json.load(open(os.path.join(args.data_dir, "doc", "SpeechAccessibility_"+args.release+"_Abbreviation_Decomposition.json")))
     
@@ -107,15 +109,21 @@ def main(args):
                 assert args.remove_parentheses is False
                 trans = re.sub("\((.*?)\)", lambda x: "("+re.sub("(.+(?=:))", " ", x.group()[1:-1])+")", trans) ### this rule keeps "(...)" rather than removing them
             
-            # remove punc except "\'"
-            trans = re.sub(PUNC, " ", trans)
-            
-            # remove extra "'"
-            trans = " ".join([con.strip("'") for con in trans.split()])
-            
             # upper case
             trans = trans.upper()
             
+            # remove punc except "\'"
+            codes = '''
+            \u0041-\u005a\u0027\u0020
+            \u00c0\u00c1\u00c4\u00c5\u00c8\u00c9\u00cd\u00cf
+            \u00d1\u00d3\u00d6\u00d8\u00db\u00dc
+            \u0106
+            ''' 
+            trans = re.sub(u"([^"+codes+"])", " ", trans)
+
+            # remove extra "'"
+            trans = " ".join([con.strip("'") for con in trans.split()])
+
             # remove extra space
             s = ' '.join(trans.strip().split())
             
