@@ -5,7 +5,7 @@
 1. To use the SAP data, sign our data user agreement [here](https://speechaccessibilityproject.beckman.illinois.edu/conduct-research-through-the-project).
 
 2. Download and rename the data folder into ```/DatasetDownload```.
-     <details>
+
      
      <summary>File Structure of /DatasetDownload</summary>
      
@@ -28,13 +28,13 @@
       ┣ SpeechAccessibility_{release}_Error_Correction.json
       ┣ SpeechAccessibility_{release}_Abbreviation_Decomposition.json
      ```
-     </details>
+
 
 
 3. Build conda environment using ```bash steps/setup.sh```.
 
 4. Unzip the data package using ```bash steps/unzip.sh```, from ```/DatasetDownload``` into ```/data``` with the file structure as follows.
-      <details>
+
       
       <summary>File Structure of /data</summary>
       
@@ -63,10 +63,10 @@
       ┃ ┣ SpeechAccessibility_{release}_Error_Correction.json
       ┃ ┣ SpeechAccessibility_{release}_Abbreviation_Decomposition.json
       ```
-      </details>
+
   
 5. Preprocess the data using ```bash steps/preprocess.sh```.
-      <details>
+
         
       <summary>Audio Resampling</summary>
         
@@ -87,9 +87,9 @@
       ┃ ┃ ┣ {test_spk_id_1}_{utt_id_1}_xxxx.wav
       ┃ ┃ ┣ ...
       ```
-      </details>
 
-      <details>
+
+
         
       <summary>Manifest Generation</summary>
         
@@ -106,9 +106,9 @@
       ┣ dev.tsv
       ┣ dev.origin.wrd
       ```
-      </details>
 
-      <details>
+
+
         
       <summary>Manifest Normalization</summary>
         
@@ -137,4 +137,4 @@
       + change to upper case.
       + remove extra space.
       ```
-      </details>
+
