@@ -34,13 +34,18 @@ def main(args):
     normalizer = Normalizer(input_case='cased', lang='en')             
     error_correction_dict = json.load(open(os.path.join(args.data_dir, "doc", "SpeechAccessibility_"+args.release+"_Error_Correction.json")))
     abbreviation_decomposition_dict = json.load(open(os.path.join(args.data_dir, "doc", "SpeechAccessibility_"+args.release+"_Abbreviation_Decomposition.json")))
+
+    if args.remove_parentheses:
+        out_ext = ".wrd.without.parentheses"
+    else:
+        out_ext = ".wrd.with.parentheses"
     
     with open(
         os.path.join(args.manifest_dir, args.split + ".tsv"), "r"
     ) as ftsv, open(
-        os.path.join(args.manifest_dir, args.split+".origin.wrd"), "r"
+        os.path.join(args.manifest_dir, args.split + ".origin.wrd"), "r"
     ) as fin, open(
-        os.path.join(args.manifest_dir, args.split+".wrd"), "w"
+        os.path.join(args.manifest_dir, args.split + out_ext), "w"
     ) as fout:
         next(ftsv)
         for item, t in tqdm(zip(fin.readlines(), ftsv.readlines())):            
