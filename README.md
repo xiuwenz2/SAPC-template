@@ -7,7 +7,7 @@
 2. Download and rename the data folder into ```/DatasetDownload```.
 
      
-     <summary>File Structure of /DatasetDownload</summary>
+     File Structure of /DatasetDownload
      
      ```plaintext  
       ### Audio Files ###
@@ -36,7 +36,7 @@
 4. Unzip the data package using ```bash steps/unzip.sh```, from ```/DatasetDownload``` into ```/data``` with the file structure as follows.
 
       
-      <summary>File Structure of /data</summary>
+      File Structure of /data
       
       ```plaintext  
       ### Raw Audio Files ###
@@ -68,7 +68,7 @@
 5. Preprocess the data using ```bash steps/preprocess.sh```.
 
         
-      <summary>Audio Resampling</summary>
+      Audio Resampling
         
       ```plaintext  
       ### run stage 0: Resampling audio files to 16k Hz (default), with processed audio files written as follows.
@@ -91,7 +91,7 @@
 
 
         
-      <summary>Manifest Generation</summary>
+      Manifest Generation
         
       ```plaintext  
       ### run stage 1: Generating preliminary wav2vec-like manifest to /manifest, with file struction as follows.
@@ -110,7 +110,7 @@
 
 
         
-      <summary>Manifest Normalization</summary>
+      Manifest Normalization
         
       ```plaintext  
       ### run stage 2: Normalizing manifest in a wav2vec-like manner, with file struction as follows.
