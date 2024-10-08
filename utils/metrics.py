@@ -9,7 +9,12 @@ def calculate_word_error_rate(references1, references2, hypotheses):
     distances = 0
     lengths = 0
 
-    for r1, r2, h in zip(references1, references2, hypotheses):
+    for ref1, ref2, hyp in zip(references1, references2, hypotheses):
+        
+        r1 = ref1.strip().split()
+        r2 = ref2.strip().split()
+        h  = hyp.strip().split()
+
         distance = [min(editdistance.eval(h, r1), len(r1)), min(editdistance.eval(h, r2), len(r2))]
         length = [len(r1), len(r2)]
         wer = [d/l for d, l in zip(distance, length)]

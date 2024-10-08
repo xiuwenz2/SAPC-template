@@ -52,12 +52,15 @@ def evaluate(submission, hypo_pth, ref_pth, **kwargs):
         output[split_name] = [round(wer * 100, 4), round(sum(semscore) / len(semscore) * 100, 4)]
 
     json.dump(output, open(os.path.join("/taiga", "results", submission+".json"), "w"), indent=6)
-    print("The evaluation for submission" + str(submission) + "has been successfully completed.")
+    print(f"The evaluation for submission {submission} has been successfully completed.")
     
     return output
 
 def get_parser():
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--submission-team-name", default="???", metavar="SUBMISSION-TEAM-NAME", help="submission team name"
+    )
     parser.add_argument(
         "--submission-pk", default="???", metavar="SUBMISSION-PK", help="submission pk"
     )
@@ -67,4 +70,4 @@ if __name__ == '__main__':
     parser = get_parser()
     args = parser.parse_args()
 
-    evaluate(args.submission_pk, os.path.join("/taiga/downloads", args.submission_pk, "results"), "/taiga/manifest")
+    evaluate(args.submission_pk, os.path.join("/taiga/downloads", args.submission_team_name, args.submission_pk, "inference"), "/taiga/manifest")
