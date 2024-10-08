@@ -4,10 +4,9 @@
 1. To use the SAP data, sign our data user agreement [here](https://speechaccessibilityproject.beckman.illinois.edu/conduct-research-through-the-project).
 
 2. Download and rename the data folder into ```/DatasetDownload```.
-
-     
-     File Structure of /DatasetDownload
      <details>
+     <summary>File Structure of /DatasetDownload</summary>
+     
      ```plaintext  
       ### Audio Files ###
       ┣ SpeechAccessibility_{release}_000.7z
@@ -33,9 +32,8 @@
 3. Build conda environment using ```bash steps/setup.sh```.
 
 4. Unzip the data package using ```bash steps/unzip.sh```, from ```/DatasetDownload``` into ```/data``` with the file structure as follows.
-
-      
-      File Structure of /data
+     <details>
+     <summary>File Structure of /data</summary>
       
       ```plaintext  
       ### Raw Audio Files ###
@@ -62,12 +60,13 @@
       ┃ ┣ SpeechAccessibility_{release}_Error_Correction.json
       ┃ ┣ SpeechAccessibility_{release}_Abbreviation_Decomposition.json
       ```
+      </details>
 
   
 5. Preprocess the data using ```bash steps/preprocess.sh```.
 
-        
-      Audio Resampling
+      <details>
+      <summary>Audio Resampling</summary>
         
       ```plaintext  
       ### run stage 0: Resampling audio files to 16k Hz (default), with processed audio files written as follows.
@@ -86,11 +85,10 @@
       ┃ ┃ ┣ {test_spk_id_1}_{utt_id_1}_xxxx.wav
       ┃ ┃ ┣ ...
       ```
-
-
-
-        
-      Manifest Generation
+      </details>
+      
+      <details>  
+      <summary>Manifest Generation</summary>
         
       ```plaintext  
       ### run stage 1: Generating preliminary wav2vec-like manifest to /manifest, with file struction as follows.
@@ -105,11 +103,10 @@
       ┣ dev.tsv
       ┣ dev.origin.wrd
       ```
+      </details>
 
-
-
-        
-      Manifest Normalization
+      <details>
+      <summary>Manifest Normalization</summary>
         
       ```plaintext  
       ### run stage 2: Normalizing manifest in a wav2vec-like manner, with file struction as follows.
@@ -136,4 +133,5 @@
       + change to upper case.
       + remove extra space.
       ```
+      <details>
 
