@@ -134,4 +134,10 @@
       + remove extra space.
       ```
       </details>
+      
+## Evaluation Scripts
++ The evaluation scripts are located in ```utils/```, including ```utils/evaluate.py``` and ```utils/metrics.py```. For testing purpose, use ```bert_score==0.3.13```.
 
+## Submission Template
++ A template of the Whisper base model is provided in ```template/```. To submit correctly, modify ```template/inference.py``` and ```template/run.sh``` as needed, paying special attention to the ***TO-DOs***.
++ Make sure to include your model file! The model is not included in the template, as it is part of the Whisper package.
