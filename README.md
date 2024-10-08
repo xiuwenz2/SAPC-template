@@ -7,7 +7,7 @@
 
      
      File Structure of /DatasetDownload
-     
+     <details>
      ```plaintext  
       ### Audio Files ###
       ┣ SpeechAccessibility_{release}_000.7z
@@ -27,7 +27,7 @@
       ┣ SpeechAccessibility_{release}_Error_Correction.json
       ┣ SpeechAccessibility_{release}_Abbreviation_Decomposition.json
      ```
-
+     </details>
 
 
 3. Build conda environment using ```bash steps/setup.sh```.
