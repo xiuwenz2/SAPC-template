@@ -133,5 +133,5 @@
       + change to upper case.
       + remove extra space.
       ```
-      <details>
+      </details>
 
