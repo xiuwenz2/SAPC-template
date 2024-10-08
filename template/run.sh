@@ -15,7 +15,7 @@ PYTHON_ENVIRONMENT=${team_name}
 root=/taiga/downloads/${team_name}/${submission_pk}
 
 if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
-    echo "Stage 0: Install conda environment..."
+    echo "Stage 0: Installing conda environment..."
     if conda info --envs | grep -q ${PYTHON_ENVIRONMENT}; then
         echo "Environment ${PYTHON_ENVIRONMENT} already exists. Activating it..."
         conda activate ${PYTHON_ENVIRONMENT}
@@ -27,7 +27,7 @@ fi
 conda activate ${PYTHON_ENVIRONMENT}
 
 if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
-    echo "Stage 1: Install dependencies..."
+    echo "Stage 1: Installing dependencies..."
     ### TO-DO: add any dependencies needed for model inference ###
     pip install numpy==1.23.4
     pip install torch==1.12.0+cu116 torchvision==0.13.0+cu116 torchaudio==0.12.0+cu116 -f https://download.pytorch.org/whl/cu116/torch_stable.html
