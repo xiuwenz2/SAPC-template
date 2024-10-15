@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# By xiuwenz2@illinois.edu, July.28, 2024.
+# By xiuwenz2@illinois.edu, July 28, 2024.
 
 """
 Data pre-processing: generate .tsv and .origin.wrd manifest.
