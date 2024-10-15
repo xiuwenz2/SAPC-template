@@ -40,15 +40,15 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
 
     splits='test1 test2'
     output_pth=${root}/inference
-    mkdir -p ${output_pth}
     len_test1=7601
     len_test2=8043
     ### TO-DO: change inference.py w.r.t. your model ###
     for split in ${splits}; do
         FILENAME=${output_pth}/${split}.hypo
+        if []; then
         LINE_COUNT=$(wc -l < "$FILENAME")
         EXPECTED_LENGTH="len_${split}"
-        if [ "$LINE_COUNT" -eq "${!EXPECTED_LENGTH}" ]; then
+        if [ -e "${FILENAME}" ] && [ "$(wc -l < "$FILENAME")" -eq "${!"len_${split}"}" ]; then
             echo "File already exists, skipping model inference..."
         else
             python ${root}/inference.py \
