@@ -46,7 +46,8 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
     ### TO-DO: change inference.py w.r.t. your model ###
     for split in ${splits}; do
         output_name=${output_pth}/${split}.hypo
-        if [ -e "${output_name}" ] && [ "$(wc -l < "$output_name")" -eq "${!len_${split}}" ]; then
+        output_len="len_${split}"
+        if [ -e "${output_name}" ] && [ "$(wc -l < "$output_name")" -eq "${!output_len}" ]; then
             echo "File already exists, skipping model inference..."
         else
             python ${root}/inference.py \
