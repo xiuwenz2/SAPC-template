@@ -1,7 +1,7 @@
 # Template for the Speech Accessibility Project (SAP) Challenge
 
 ## Data Preparation
-1. To use the SAP data, sign our data user agreement [here](https://speechaccessibilityproject.beckman.illinois.edu/conduct-research-through-the-project).
+1. To use the SAP data (including the processed version), sign our data user agreement [here](https://speechaccessibilityproject.beckman.illinois.edu/conduct-research-through-the-project).
 
 2. Download and rename the data folder into ```/DatasetDownload```.
      <details>
