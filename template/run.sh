@@ -1,6 +1,6 @@
 #!/bin/bash
 
-stage=0
+stage=-1
 stop_stage=3
 
 team_name=$1
@@ -13,6 +13,9 @@ source ~/miniconda3/etc/profile.d/conda.sh
 PYTHON_ENVIRONMENT=${team_name}
 
 root=/taiga/downloads/${team_name}/${submission_pk}
+if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
+    unzip ${root}.zip -d ${root}
+fi
 
 if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
     echo "Stage 0: Installing conda environment..."
