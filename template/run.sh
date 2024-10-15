@@ -13,7 +13,7 @@ source ~/miniconda3/etc/profile.d/conda.sh
 PYTHON_ENVIRONMENT=${team_name}
 
 root=/taiga/downloads/${team_name}/${submission_pk}
-if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
+if [ $stage -le -1 ] && [ $stop_stage -ge -1 ]; then
     unzip ${root}.zip -d ${root}
 fi
 
