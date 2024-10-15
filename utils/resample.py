@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# By xiuwenz2@illinois.edu, Oct.17, 2023.
+# By xiuwenz2@illinois.edu, Oct. 17, 2023.
 
 """
 Data pre-processing: resample audios to 16k.
