@@ -1,4 +1,6 @@
-#metrics.py
+#!/usr/bin/env python3
+# By xiuwenz2@illinois.edu, Oct. 08, 2024.
+
 import numpy as np
 import jellyfish, editdistance, torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
