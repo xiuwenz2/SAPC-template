@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# By xiuwenz2@illinois.edu, Oct.08, 2024.
+# By xiuwenz2@illinois.edu, Oct. 08, 2024.
 
 import argparse, os, re, torch, json
 from metrics import calculate_word_error_rate, SemScore
