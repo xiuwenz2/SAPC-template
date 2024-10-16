@@ -21,7 +21,7 @@ def process_punc(trans):
     return trans
 
 def evaluate(submission, hypo_pth, ref_pth, **kwargs):
-    print("Starting Evaluation.....")
+    print("Evaluation in Progress...")
     
     output = {"test_1_split":[], "test_2_split":[]}
 
