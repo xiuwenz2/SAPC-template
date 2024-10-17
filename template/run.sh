@@ -18,7 +18,7 @@ if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
     echo "Stage 0: Installing conda environment..."
     if conda info --envs | grep -q ${PYTHON_ENVIRONMENT}; then
         echo "Environment ${PYTHON_ENVIRONMENT} already exists. Deleting it..."
-        conda remove --name ${PYTHON_ENVIRONMENT} --all
+        conda remove --name ${PYTHON_ENVIRONMENT} --all --yes
     fi
     echo "Creating environment ${PYTHON_ENVIRONMENT}..."
     conda create --name ${PYTHON_ENVIRONMENT} python=${python_version} --yes
