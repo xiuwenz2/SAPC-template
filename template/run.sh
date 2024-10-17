@@ -6,23 +6,22 @@ stop_stage=3
 team_name=$1
 submission_pk=$2
 
-### TO-DO: specify your python version ###
-python_version=3.9
 source ~/.bashrc
 source ~/miniconda3/etc/profile.d/conda.sh
 PYTHON_ENVIRONMENT=${team_name}
-
 root=/taiga/downloads/${team_name}/${submission_pk}
+
+### TO-DO: specify your python version ###
+python_version=3.9
 
 if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
     echo "Stage 0: Installing conda environment..."
     if conda info --envs | grep -q ${PYTHON_ENVIRONMENT}; then
-        echo "Environment ${PYTHON_ENVIRONMENT} already exists. Activating it..."
-        conda activate ${PYTHON_ENVIRONMENT}
-    else
-        echo "Creating environment ${PYTHON_ENVIRONMENT}..."
-        conda create --name ${PYTHON_ENVIRONMENT} python=${python_version} --yes
+        echo "Environment ${PYTHON_ENVIRONMENT} already exists. Deleting it..."
+        conda remove --name ${PYTHON_ENVIRONMENT} --all
     fi
+    echo "Creating environment ${PYTHON_ENVIRONMENT}..."
+    conda create --name ${PYTHON_ENVIRONMENT} python=${python_version} --yes
 fi
 conda activate ${PYTHON_ENVIRONMENT}
 
