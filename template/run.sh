@@ -2,7 +2,7 @@
 '''
 Note the template for remote evaluation on a private server,
 so DO NOT change anything other than the TO-DOs, including
-the file names!!!
+file names!!!
 ######## TO-DO 0: Please provide your contact information ########
 (e.g.,) Email: xiuwenz2@illinois.edu
 '''
