@@ -3,8 +3,9 @@
 Note the template for remote evaluation on a private server,
 so DO NOT change anything other than the TO-DOs, including
 file names!!!
-######## TO-DO 0: Please provide your contact information ########
+######## TO-DO 1: Please provide your contact information ########
 (e.g.,) Email: xiuwenz2@illinois.edu
+##################################################################
 '''
 
 stage=0
@@ -18,8 +19,9 @@ source ~/miniconda3/etc/profile.d/conda.sh
 PYTHON_ENVIRONMENT=${team_name}
 root=/taiga/downloads/${team_name}/${submission_pk}
 
-######## TO-DO 1: specify your python version ########
+######## TO-DO 2: specify your python version ########
 python_version=3.9
+######################################################
 
 if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
     echo "Stage 0: Installing conda environment..."
@@ -34,11 +36,12 @@ conda activate ${PYTHON_ENVIRONMENT}
 
 if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
     echo "Stage 1: Installing dependencies..."
-    ######## TO-DO 2: add any dependencies needed for model inference ########
+    ######## TO-DO 3: add any dependencies needed for model inference ########
     pip install numpy==1.23.4
     pip install torch==1.12.0+cu116 torchvision==0.13.0+cu116 torchaudio==0.12.0+cu116 -f https://download.pytorch.org/whl/cu116/torch_stable.html
     pip install git+https://github.com/openai/whisper.git
     pip install tqdm
+    ##########################################################################
 fi
 
 if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
@@ -57,11 +60,12 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
         if [ -e "${output_name}" ] && [ "$(wc -l < "$output_name")" -eq "${!output_len}" ]; then
             echo "File already exists, skipping model inference..."
             
-        ######## TO-DO 3: change inference.py w.r.t. your model ########
         else
+        ######## TO-DO 4: change inference.py w.r.t. your model ########
             python ${root}/inference.py \
                 --split ${split} \
                 --output-name ${output_name}
+        ################################################################
         fi
     done
     conda deactivate
