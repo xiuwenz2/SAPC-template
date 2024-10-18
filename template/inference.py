@@ -26,7 +26,8 @@ def get_parser():
     return parser
 
 def main(args):
-    ### TO-DO: load model ###
+    
+    ######## TO-DO 1: load your own model ########
     model = whisper.load_model("base")
     tokenizer = whisper.tokenizer.get_tokenizer(multilingual=False)
     number_tokens = [
@@ -34,6 +35,7 @@ def main(args):
         for i in range(tokenizer.eot)
         if all(c in "0123456789$%&-–—+£=�*…•" for c in tokenizer.decode([i]).removeprefix(" "))
     ]
+    ##############################################
     
     ### Dump Inference Results
     manifest = os.path.join(args.manifest_pth, args.split + ".tsv")
@@ -41,12 +43,15 @@ def main(args):
         next(ftsv)
         for t in tqdm(ftsv.readlines()):
             fname = t.strip().split()[0].split("/")[-1]
-            ### TO-DO: modify the following inference scripts ###
+            
+            ######## TO-DO 2: modify the following inference scripts ########
             result = model.transcribe(
                 os.path.join(args.data_pth, args.split, fname),
                 suppress_tokens=[-1] + number_tokens,
                 temperature=0.0
             )
+            #################################################################
+            
             print(result["text"].strip(), file=fhypo)
 
 if __name__ == "__main__":
