@@ -1,4 +1,11 @@
 #!/bin/bash
+'''
+Note the template for remote evaluation on a private server,
+so DO NOT change anything other than the TO-DOs, including
+the file names!!!
+######## TO-DO 0: Please provide your contact information ########
+(e.g.,) Email: xiuwenz2@illinois.edu
+'''
 
 stage=0
 stop_stage=3
@@ -11,7 +18,7 @@ source ~/miniconda3/etc/profile.d/conda.sh
 PYTHON_ENVIRONMENT=${team_name}
 root=/taiga/downloads/${team_name}/${submission_pk}
 
-### TO-DO: specify your python version ###
+######## TO-DO 1: specify your python version ########
 python_version=3.9
 
 if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
@@ -27,7 +34,7 @@ conda activate ${PYTHON_ENVIRONMENT}
 
 if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
     echo "Stage 1: Installing dependencies..."
-    ### TO-DO: add any dependencies needed for model inference ###
+    ######## TO-DO 2: add any dependencies needed for model inference ########
     pip install numpy==1.23.4
     pip install torch==1.12.0+cu116 torchvision==0.13.0+cu116 torchaudio==0.12.0+cu116 -f https://download.pytorch.org/whl/cu116/torch_stable.html
     pip install git+https://github.com/openai/whisper.git
@@ -40,14 +47,17 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
     splits='test1 test2'
     output_pth=${root}/inference
     mkdir -p ${output_pth}
+    
     len_test1=7601
     len_test2=8043
-    ### TO-DO: change inference.py w.r.t. your model ###
+    
     for split in ${splits}; do
         output_name=${output_pth}/${split}.hypo
         output_len="len_${split}"
         if [ -e "${output_name}" ] && [ "$(wc -l < "$output_name")" -eq "${!output_len}" ]; then
             echo "File already exists, skipping model inference..."
+            
+        ######## TO-DO 3: change inference.py w.r.t. your model ########
         else
             python ${root}/inference.py \
                 --split ${split} \
