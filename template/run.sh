@@ -63,6 +63,7 @@ if [ $stage -le 2 ] && [ $stop_stage -ge 2 ]; then
         else
         ######## TO-DO 4: change inference.py w.r.t. your model ########
             python ${root}/inference.py \
+                --root ${root} \
                 --split ${split} \
                 --output-name ${output_name}
         ################################################################
