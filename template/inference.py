@@ -18,6 +18,9 @@ def get_parser():
         "--manifest-pth", default="/taiga/manifest", type=str, metavar="MANIFEST_PTH", help="manifest_pth"
     )
     parser.add_argument(
+        "--root", default="/taiga/downloads/???/???", type=str, metavar="ROOT", help="???s represent team name, submission pk."
+    )
+    parser.add_argument(
         "--split", default="test1", type=str, metavar="SPLIT", help="split"
     )
     parser.add_argument(
@@ -29,6 +32,7 @@ def main(args):
     
     ######## TO-DO 1: load your own model ########
     model = whisper.load_model("base")
+    ### e.g., model = torch.load(os.path.join(args.root, "model.pt"))
     tokenizer = whisper.tokenizer.get_tokenizer(multilingual=False)
     number_tokens = [
         i
