@@ -3,35 +3,11 @@
 ## Data Preparation
 1. To use the SAP data (including the processed version), sign our data user agreement [here](https://speechaccessibilityproject.beckman.illinois.edu/conduct-research-through-the-project).
 
-2. Download and rename the data folder into ```/DatasetDownload```.
-     <details>
-     <summary>File Structure of /DatasetDownload</summary>
-     
-     ```plaintext  
-      ### Audio Files ###
-      ┣ SpeechAccessibility_{release}_000.7z
-      ┣ SpeechAccessibility_{release}_001.7z
-      ┣ ...
-      ┣ SpeechAccessibility_{release}_011.7z
-     
-      ### Json Files I (per spk) ###
-      ┣ SpeechAccessibility_{release}_Only_Json.7z
-     
-      ### Json Files II (overall) ###
-      ┣ SpeechAccessibility_{release}_Split.json
-      ┣ SpeechAccessibility_{release}_Split_by_Contributors.json
-     
-      ### Json Files III (mismatch check) ###
-      ┣ SpeechAccessibility_{release}_Audio_Excluded.json
-      ┣ SpeechAccessibility_{release}_Error_Correction.json
-      ┣ SpeechAccessibility_{release}_Abbreviation_Decomposition.json
-     ```
-     </details>
-
+2. Download the raw data folder ```/SpeechAccessibility_Competition_Release``` from box.
 
 3. Build conda environment using ```bash steps/setup.sh```.
 
-4. Unzip the data package using ```bash steps/unzip.sh```, from ```/DatasetDownload``` into ```/data``` with the file structure as follows.
+4. Unzip the data package using ```bash steps/unzip.sh```, from ```/SpeechAccessibility_Competition_Release``` into ```/data``` with the file structure as follows. Note: Please download and unzip the file ```/SAP0430_processed/data/doc.7z``` into ```/data/doc``` directly from box.
      <details>
      <summary>File Structure of /data</summary>
       
