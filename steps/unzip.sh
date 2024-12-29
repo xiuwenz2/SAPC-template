@@ -1,42 +1,28 @@
 #!/bin/bash
 
-stage=0
+stage=1
 stop_stage=1
-
-
-## install 7zip
-if [ $stage -le 0 ] && [ $stop_stage -ge 0 ]; then
-    
-    pkgname=7z2406-linux-x64.tar.xz     ### replace this link according to the arch
-    wget https://www.7-zip.org/a/${pkgname}
-    mkdir 7zip
-    tar -xvf ${pkgname} -C 7zip
-    rm ${pkgname}
-    
-fi
-
 
 ## unzip dataset
 if [ $stage -le 1 ] && [ $stop_stage -ge 1 ]; then
 
-    download=$PWD/DatasetDownload
+    mkdir -p $PWD/data
+    mkdir -p $PWD/data/raw
     
-    for file in `ls ${download} | grep "**.7z"`; do
-        if [ "$file" == `ls ${download} | grep "Json.7z"` ]
-        then
-            7zip/7zz x ${download}/${file} -r -odata/doc
-        else
-            7zip/7zz x ${download}/${file} -r -odata/raw
-        fi
-    done
-    
-    for file in `ls ${download} | grep "**.json"`; do
-        cp ${download}/${file} data/doc/${file}
-    done
-    
-    for file in `ls data/raw | grep "**.7z"`; do
-        7zip/7zz x data/raw/${file} -r -odata/raw
-        rm data/raw/${file}
+    splits="Train Dev"
+    for split in ${splits}; do
+        download=$PWD/SpeechAccessibility_Competition_Release/${split}
+
+        for file in `ls ${download} | grep "**.tar"`; do
+            if [ "$file" != `ls ${download} | grep "Json.tar"` ]; then
+                tar -xf ${download}/${file} -C $PWD/data/raw
+            fi
+        done
+
+        for file in `ls $PWD/data/raw | grep "**.tar"`; do
+            tar -xf $PWD/data/raw/${file} -C $PWD/data/raw
+            rm $PWD/data/raw/${file}
+        done
     done
 
 fi
