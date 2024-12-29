@@ -7,7 +7,7 @@
 
 3. Build conda environment using ```bash steps/setup.sh```.
 
-4. Unzip the data package using ```bash steps/unzip.sh```, from ```/SpeechAccessibility_Competition_Release``` into ```/data``` with the file structure as follows. Note: Please download and unzip the file ```/SAP0430_processed/data/doc.7z``` into ```/data/doc``` directly from box.
+4. Unzip the data package using ```bash steps/unzip.sh```, from ```/SpeechAccessibility_Competition_Release``` into ```/data``` with the file structure as follows. Note: Please download the ```doc.7z``` file directly from the ```/SAP0430_processed/data/``` box folder and unzip it into ```/data/doc```.
      <details>
      <summary>File Structure of /data</summary>
       
