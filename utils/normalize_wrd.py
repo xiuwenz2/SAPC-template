@@ -70,6 +70,9 @@ def main(args):
                 content_ = []
                 for con in content:
                     if re.findall("(.+(?=:))", con) and re.findall("(.+(?=:))", con)[0]=="w":
+                        if len(re.findall(r"\d+", con)) == 0:
+                            content_.append(" ")
+                            continue
                         assert len(re.findall(r"\d+", con)) == 1
                         num_unk = int(re.findall(r"\d+", con)[0])
                         content_.append(" ".join(["UNK" for i in range(num_unk)]))
