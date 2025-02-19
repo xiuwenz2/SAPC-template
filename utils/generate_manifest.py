@@ -48,10 +48,10 @@ def process_timestamps(fpt, trans):
     transcriptions = []
     
     for timestamp in timestamps:
-        if timestamp == " ":
+        if timestamp.strip() in ["", "#ts"]:
             continue
         ts_ls = timestamp.strip().split()
-        duration += (float(ts_ls[1].strip()) - float(ts_ls[0].strip()))
+        duration += (float(ts_ls[1].strip().strip(".")) - float(ts_ls[0].strip().strip(".")))
         transcriptions.append(" ".join(ts_ls[2:]))
     
     if abs(round(duration, 2) - round(sf.info(fpt).duration, 2)) <= 0.02:
@@ -62,11 +62,11 @@ def process_timestamps(fpt, trans):
     combined = AudioSegment.empty() 
     
     for timestamp in timestamps:
-        if timestamp == " ":
+        if timestamp.strip() in ["", "#ts"]:
             continue
         ts_ls = timestamp.strip().split()
-        start_time = float(ts_ls[0].strip()) * 1000
-        end_time = float(ts_ls[1].strip()) * 1000
+        start_time = float(ts_ls[0].strip().strip(".")) * 1000
+        end_time = float(ts_ls[1].strip().strip(".")) * 1000
         
         combined += audio[start_time:end_time]
     
