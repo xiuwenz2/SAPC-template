@@ -1,0 +1,12 @@
+cd ./processed/train
+awk -F'\t' '$2 >= 16000*15 { print $1 }' ./manifest/train.tsv | xargs -I {} -P 24 cp {} ./segmented/train/ 
+
+python generate_lab.py --split train
+
+split=train
+mfa model download acoustic english_us_arpa
+mfa model download dictionary english_us_arpa
+mfa align ./segmented/${split}/ english_us_arpa english_us_arpa ./mfa/${split} --single_speaker --output_format json --num_jobs 24
+
+cd ../..
+python segment_audio.py --split train --num_workers 24
