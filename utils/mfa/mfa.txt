@@ -10,3 +10,5 @@ mfa align ./segmented/${split}/ english_us_arpa english_us_arpa ./mfa/${split} -
 
 cd ../..
 python segment_audio.py --split train --num_workers 24
+
+python generate_manifest.py --split train
