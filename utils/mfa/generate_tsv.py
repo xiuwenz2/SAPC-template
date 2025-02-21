@@ -19,6 +19,9 @@ def get_parser():
     parser.add_argument(
         "--data-dir", default="./", type=str, metavar="DATA-DIR", help="data dir"
     )
+    parser.add_argument(
+        "--manifest-dir", default="./aligned/manifest", type=str, metavar="DATA-DIR", help="data dir"
+    )
     return parser
             
 def main(args):        
