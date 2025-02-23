@@ -11,6 +11,18 @@ from multiprocessing import Pool
 # from nemo_text_processing.text_normalization.normalize import Normalizer
 # PUNC = r"[─()<>\-/\[\]{}｢｣､〜〰–—‛“”„‟…‧﹏.,:?~!\"\+*~;]"
 
+word_ls = ['MSNNBC', 'MSNBC', 'MSSNNBC', 'AARP', 'ACDC', 'ADHD', 'BBBC', 'ESPN', 'HGTV', 'LBGQ', 'NCIS', 'NPPA', 'PTSD', 'RAMC', 
+           'SPCA', 'TLSC', 'WDRB', 'WDTN', 'WHIO', 'WHYY', 'WKRP', 'WNBA', 'WNYC', 'YMCA', 'AAA', 'ABC', 'ACP', 'ADA', 'AHS', 
+           'AJR', 'AKA', 'ALS', 'AMC', 'AOL', 'AXL', 'BAU', 'BBC', 'BLT', 'BMW', 'BRB', 'BST', 'BTS', 'CBS', 'CCM',
+           'CEO', 'CFO', 'CIA', 'CNC', 'CNN', 'CPR', 'CSI', 'CVS', 'DCI', 'DDA', 'DNA', 'DSW', 'DVD', 'DVR', 'FAC', 
+           'FBI', 'FDR', 'GPA', 'HBO', 'ICS', 'IRS', 'JFK', 'LAL', 'LSU', 'MGK', 'MIT', 'MMA', 'MSN', 'NBA', 'NBC', 
+           'NCI', 'NFL', 'NHK', 'NHL', 'NPR', 'NRA', 'OAN', 'OCD', 'PBC', 'PBS', 'PDU', 'PGA', 'PLS', 'PSP', 'RBG', 
+           'REM', 'REO', 'RSD', 'SNL', 'TBS', 'TNT', 'TSA', 'UPS', 'USA', 'USC', 'VSP', 'WRB', 'AC', 'AD', 'AI', 'AM', 
+           'AV', 'BB', 'BJ', 'CD', 'CJ', 'CO', 'CV', 'DC', 'DJ', 'DV', 'ER', 'ES', 'FC', 'FO', 'FX', 'GI', 'GP', 
+           'GR', 'GT', 'ID', 'IV', 'JF', 'JJ', 'KC', 'LA', 'MP', 'NP', 'OJ', 'OK', 'PA', 'PC', 'PD', 'PJ', 
+           'PM', 'PT', 'QR', 'RC', 'RH', 'RV', 'TV', 'UK', 'US', 'WH', 'WO', 'XM', 'PPM', 'TX', 'NYC', 'TTV',
+          'II', 'AAM', 'IL', 'NI', 'SG', 'PB', 'NSYNC', 'YK', 'AJ', 'PBJ']
+
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -39,6 +51,9 @@ def init_worker(data_dir, release, remove_parentheses):
     #error_correction_dict = json.load(open(error_correction_path, "r"))
     #abbreviation_decomposition_dict = json.load(open(abbreviation_decomposition_path, "r"))
     REMOVE_PARENTHESES = remove_parentheses
+
+def separate_abbreviation(word):
+    return " ".join(word)
 
 def process_line(args):
     origin_line, manifest_line = args
@@ -125,10 +140,20 @@ def process_line(args):
     trans = " ".join([con.strip("'") for con in trans.split()])
 
     # remove extra space
-    s = ' '.join(trans.strip().split())
+    trans = ' '.join(trans.strip().split())
+
+    # separate abbreviation
+    words = trans.strip().split()
+    new_words = []
+    for word in words:
+        if word in word_ls:
+            new_words.append(separate_abbreviation(word))
+        else:
+            new_words.append(word)
+    trans = " ".join(new_words)
             
     #fout.write(f'{s}\n')
-    return s
+    return trans
 
 def main(args):
     manifest_path = os.path.join(args.manifest_dir, args.split + ".tsv")
