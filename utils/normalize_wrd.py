@@ -23,6 +23,13 @@ word_ls = ['MSNNBC', 'MSNBC', 'MSSNNBC', 'AARP', 'ACDC', 'ADHD', 'BBBC', 'ESPN',
            'PM', 'PT', 'QR', 'RC', 'RH', 'RV', 'TV', 'UK', 'US', 'WH', 'WO', 'XM', 'PPM', 'TX', 'NYC', 'TTV',
           'II', 'AAM', 'IL', 'NI', 'SG', 'PB', 'NSYNC', 'YK', 'AJ', 'PBJ']
 
+codes = '''
+            \u0041-\u005a\u0027\u0020
+            \u00c0\u00c1\u00c4\u00c5\u00c8\u00c9\u00cd\u00cf
+            \u00d1\u00d3\u00d6\u00d8\u00db\u00dc
+            \u0106
+            '''
+
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -59,7 +66,17 @@ def process_line(args):
     origin_line, manifest_line = args
     fname = manifest_line.strip().split()[0].split("/")[-1]
     trans = origin_line.strip()
-            
+    
+    # separate abbreviation
+    words = trans.strip().split()
+    new_words = []
+    for word in words:
+        if re.sub(u"([^"+codes+"])", "", word) in word_ls:
+            new_words.append(separate_abbreviation(word))
+        else:
+            new_words.append(word)
+    trans = ' '.join(new_words)
+           
     # change "\’" & "\‘" back to "\'"
     trans = re.sub(r"[\’\‘]", r"'", trans)
             
@@ -123,16 +140,6 @@ def process_line(args):
     else:
         assert REMOVE_PARENTHESES is False
         trans = re.sub("\((.*?)\)", lambda x: "("+re.sub("(.+(?=:))", " ", x.group()[1:-1])+")", trans) ### this rule keeps "(...)" rather than removing them
-    
-    # separate abbreviation
-    words = trans.strip().split()
-    new_words = []
-    for word in words:
-        if word in word_ls:
-            new_words.append(separate_abbreviation(word))
-        else:
-            new_words.append(word)
-    trans = ' '.join(new_words)
            
     # upper case
     trans = trans.upper()
