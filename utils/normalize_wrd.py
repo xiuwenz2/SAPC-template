@@ -132,7 +132,8 @@ def process_line(args):
             new_words.append(separate_abbreviation(word))
         else:
             new_words.append(word)
-                   
+    trans = ' '.join(new_words)
+           
     # upper case
     trans = trans.upper()
             
