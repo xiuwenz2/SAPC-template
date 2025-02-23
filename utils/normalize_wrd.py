@@ -123,7 +123,16 @@ def process_line(args):
     else:
         assert REMOVE_PARENTHESES is False
         trans = re.sub("\((.*?)\)", lambda x: "("+re.sub("(.+(?=:))", " ", x.group()[1:-1])+")", trans) ### this rule keeps "(...)" rather than removing them
-            
+    
+    # separate abbreviation
+    words = trans.strip().split()
+    new_words = []
+    for word in words:
+        if word in word_ls:
+            new_words.append(separate_abbreviation(word))
+        else:
+            new_words.append(word)
+                   
     # upper case
     trans = trans.upper()
             
@@ -141,16 +150,6 @@ def process_line(args):
 
     # remove extra space
     trans = ' '.join(trans.strip().split())
-
-    # separate abbreviation
-    words = trans.strip().split()
-    new_words = []
-    for word in words:
-        if word in word_ls:
-            new_words.append(separate_abbreviation(word))
-        else:
-            new_words.append(word)
-    trans = " ".join(new_words)
             
     #fout.write(f'{s}\n')
     return trans
