@@ -144,7 +144,7 @@ def process_line(args):
     # upper case
     trans = trans.upper()
             
-            # remove punc except "\'"
+    # remove punc except "\'"
     codes = '''
             \u0041-\u005a\u0027\u0020
             \u00c0\u00c1\u00c4\u00c5\u00c8\u00c9\u00cd\u00cf
