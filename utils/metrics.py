@@ -37,6 +37,7 @@ def calculate_word_error_rate(references1, references2, hypotheses):
     return distances/lengths
 
 class SemScore:
+    ### The primary contributions to this part were made by Bornali Phukon.
     def __init__(self,
                  model='R',
                  batch_size=32,
