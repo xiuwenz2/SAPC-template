@@ -1,4 +1,4 @@
-# SAPC2 Workplace
+# SAPC2 Template
 
 ## 1. Preprocess
 
@@ -54,4 +54,5 @@ spk001_utt002,good morning
 | 2 | Evaluate: normalize → sclite → compute WER/CER | per hypothesis |
 
 **Output**: `DATA_ROOT/eval/metrics.{Split}.json` with `wer` and `cer`.
+
 
