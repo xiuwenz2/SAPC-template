@@ -1,0 +1,6 @@
+torch>=2.0.0
+huggingface_hub >= 0.20
+filelock >= 3.12
+faster-whisper>=1.0.0
+tqdm>=4.65.0
+

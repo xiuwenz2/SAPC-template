@@ -1,0 +1,12 @@
+--extra-index-url https://download.pytorch.org/whl/cu118
+
+torch==2.4.0+cu118
+torchaudio==2.4.0+cu118
+torchvision==0.19.0+cu118
+
+nemo_toolkit[asr]==2.5.3
+numpy>=1.26,<2.1
+matplotlib>=3.8
+huggingface_hub>=0.24
+filelock>=3.12
+tqdm>=4.65.0

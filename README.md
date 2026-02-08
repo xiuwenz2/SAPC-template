@@ -1,119 +1,57 @@
-# Template for the Speech Accessibility Project (SAP) Challenge
+# SAPC2 Workplace
 
-## Data Preparation
-1. To use the SAP data (including the processed version), sign our data user agreement [here](https://speechaccessibilityproject.beckman.illinois.edu/conduct-research-through-the-project).
+## 1. Preprocess
 
-2. Download the raw data folder ```/SpeechAccessibility_Competition_Release``` from box.
+**Preprocessed data is available on Box** and will be provided to all approved participants. If you need to run preprocessing yourself:
 
-3. Build conda environment using ```bash steps/setup.sh```.
+```bash
+# Edit preprocess.sh to set CONDA_ENV_NAME, DATA_ROOT, PROJ_ROOT, then:
+./preprocess.sh --start_stage 1 --stop_stage 3 --splits Train Dev
+```
 
-4. Unzip the data package using ```bash steps/unzip.sh```, from ```/SpeechAccessibility_Competition_Release``` into ```/data``` with the file structure as follows. Note: Please download the ```doc.7z``` file directly from the ```/SAP0430_processed/data/``` box folder and unzip it into ```/data/doc```.
-     <details>
-     <summary>File Structure of /data</summary>
-      
-      ```plaintext  
-      ### Raw Audio Files ###
-      ┣ raw
-      ┃ ┣ {spk_id_1}
-      ┃ ┃ ┣ {spk_id_1}_{utt_id_1}_xxxx.wav
-      ┃ ┃ ┣ {spk_id_1}_{utt_id_2}_xxxx.wav
-      ┃ ┃ ┣ ...
-      ┃ ┃ ┣ {spk_id_1}.json
-      ┃ ┣ {spk_id_2}
-      ┃ ┣ ...
-      
-      ### Json Files ###
-      ┣ doc
-      ┃ ### per spk ###
-      ┃ ┣ {spk_id_1}.json
-      ┃ ┣ {spk_id_2}.json
-      ┃ ┣ ...
-      ┃ ### overall ###
-      ┃ ┣ SpeechAccessibility_{release}_Split.json
-      ┃ ┣ SpeechAccessibility_{release}_Split_by_Contributors.json
-      ┃ ### mismatch check ###
-      ┃ ┣ SpeechAccessibility_{release}_Audio_Excluded.json
-      ┃ ┣ SpeechAccessibility_{release}_Error_Correction.json
-      ┃ ┣ SpeechAccessibility_{release}_Abbreviation_Decomposition.json
-      ```
-      </details>
+| Stage | What it does |
+|---|---|
+| 1 | Environment setup (conda + pip) |
+| 2 | Extract tar files → `raw/` |
+| 3 | Resample audio, copy JSONs, generate manifest CSVs, normalize refs |
 
-  
-5. Preprocess the data using ```bash steps/preprocess.sh```.
+Output: `DATA_ROOT/manifest/{Split}.csv` with columns `id`, `text`, `norm_text_with_disfluency`, `norm_text_without_disfluency`.
 
-      <details>
-      <summary>Audio Resampling</summary>
-        
-      ```plaintext  
-      ### run stage 0: Resampling audio files to 16k Hz (default), with processed audio files written as follows.
+## 2. Submission Templates
 
-      /data
-      
-      ### Processed Audio Files ###
-      ┣ processed
-      ┃ ┣ train
-      ┃ ┃ ┣ {train_spk_id_1}_{utt_id_1}_xxxx.wav
-      ┃ ┃ ┣ ...
-      ┃ ┣ dev
-      ┃ ┃ ┣ {dev_spk_id_1}_{utt_id_1}_xxxx.wav
-      ┃ ┃ ┣ ...
-      ┃ ┣ test
-      ┃ ┃ ┣ {test_spk_id_1}_{utt_id_1}_xxxx.wav
-      ┃ ┃ ┣ ...
-      ```
-      </details>
-      
-      <details>  
-      <summary>Manifest Generation</summary>
-        
-      ```plaintext  
-      ### run stage 1: Generating preliminary wav2vec-like manifest to /manifest, with file struction as follows.
-      
-      /manifest
-      
-      ### Manifest Files ###
-      ┣ train.tsv
-      ┣ train.origin.wrd
-      ┣ test.tsv
-      ┣ test.origin.wrd
-      ┣ dev.tsv
-      ┣ dev.origin.wrd
-      ```
-      </details>
+See [`track1_starting_kit/README.md`](track1_starting_kit/README.md).
 
-      <details>
-      <summary>Manifest Normalization</summary>
-        
-      ```plaintext  
-      ### run stage 2: Normalizing manifest in a wav2vec-like manner, with file struction as follows.
-      
-      /manifest
-      
-      ### Manifest Files ###
-      ┣ train.wrd
-      ┣ test.wrd
-      ┣ dev.wrd
-      ```
+## 3. Evaluation
 
-      ```plaintext  
-      Normalization rules are listed as follows.
-      
-      + change "\’" & "\‘" back to "\'".
-      + process "[...]": remove words within square brackets "[...]".
-      + process "{...}": change uncertain words within curly brackets "{...}" to "UNK" except keeping human-guessed ones "{g:...}".
-      + remove "*", "~" before nemo_text_processing.
-      + nemo_text_processing for basic text normalization, including digital numbers, abbreviations, and special punctuations.
-      + update transcription manually to correct errors and decomposite abbreviations.
-      + process "(...)": set the action attribute **--remove-parentheses** to remove words within parentheses "(...)" except keeping ones with prefix, like "(cs:...)", "(assistant:...)". Otherwise, keep everything within parentheses.
-      + remove punctuations except "\'" within words.
-      + change to upper case.
-      + remove extra space.
-      ```
-      </details>
-      
-## Evaluation Scripts
-+ The evaluation scripts are located in ```utils/```, including ```utils/evaluate.py``` and ```utils/metrics.py```. For testing purpose, use ```bert_score==0.3.13```.
+Score ASR predictions: normalize hyp → sclite alignment → min-two-refs WER/CER.
 
-## Submission Template
-+ A template of the Whisper base model is provided in ```template/```. To submit correctly, modify ***TO-DOs*** ONLY in ```template/run.sh```, and update ```template/inference.py``` correspondingly.
-+ Make sure to include your model file! The model is not included in the template, as it is part of the Whisper package.
+**Input**: a hypothesis CSV (`--hyp-csv`) with at least two columns:
+
+| Column | Description |
+|---|---|
+| `id` | Utterance ID (must match the manifest CSV) |
+| `raw_hypos` | Raw hypothesis text (column name configurable via `--hyp-col`) |
+
+Example:
+
+```
+id,raw_hypos
+spk001_utt001,hello world
+spk001_utt002,good morning
+```
+
+**Run**:
+
+```bash
+# Edit evaluate.sh to set DATA_ROOT, PROJ_ROOT, SCTK_DIR, then:
+./evaluate.sh --start_stage 0 --stop_stage 2 --split Dev-all --hyp-csv /path/to/hyp.csv
+```
+
+| Stage | What it does | Run once? |
+|---|---|---|
+| 0 | Install SCTK (sclite) | ✓ |
+| 1 | Prepare reference `.trn` files from manifest CSV | ✓ per split |
+| 2 | Evaluate: normalize → sclite → compute WER/CER | per hypothesis |
+
+**Output**: `DATA_ROOT/eval/metrics.{Split}.json` with `wer` and `cer`.
+
