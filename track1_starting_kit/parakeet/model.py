@@ -3,6 +3,14 @@
 Baseline: NVIDIA Parakeet TDT 0.6B v2 (NeMo).
 Participants must implement a Model class with a predict(wav_path) method.
 """
+
+# ── Use packages from the clean venv created by setup.sh ──
+import sys, os
+
+_venv_site = "/opt/parakeet_venv/lib/python3.11/site-packages"
+if os.path.isdir(_venv_site):
+    sys.path.insert(0, _venv_site)
+
 import torch
 import nemo.collections.asr as nemo_asr
 
@@ -11,7 +19,9 @@ class Model:
     """ASR Model using NeMo Parakeet."""
 
     def __init__(self):
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        if not torch.cuda.is_available():
+            raise RuntimeError("CUDA is not available — this track requires GPU.")
+        device = "cuda"
         print(f"Loading parakeet-tdt-0.6b-v2 on {device}")
 
         self.model = nemo_asr.models.ASRModel.from_pretrained(
@@ -43,4 +53,3 @@ class Model:
         first = outputs[0]
         text = first if isinstance(first, str) else getattr(first, "text", "") or ""
         return text.strip()
-

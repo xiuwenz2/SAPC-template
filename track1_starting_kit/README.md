@@ -1,4 +1,4 @@
-# SAPC2 Starting Kit for Track 1
+# SAPC2 Starting Kit
 
 ## Submission Interface
 
@@ -34,7 +34,7 @@ We provide three baseline examples. Pick one as your starting point:
 ```
 submission.zip
 ├── model.py              # Required
-├── requirements.txt      # Recommended
+├── setup.sh              # Recommended (environment setup script)
 └── ...                   # Other supporting files (optional)
 ```
 
@@ -42,14 +42,16 @@ submission.zip
 
 ## Environment
 
-- Docker image: `pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime`
-- GPU: CUDA-enabled GPU available
+- Docker image: `pytorch/pytorch:2.5.0-cuda12.4-cudnn9-runtime`
+- Pre-installed: **PyTorch 2.5.0+cu124**, torchaudio, torchvision
+- GPU: CUDA-enabled GPU available (CUDA 12.4)
 - Time limit: 21600 seconds per submission
-- Dependencies in `requirements.txt` are auto-installed before execution.
+- If a `setup.sh` is provided, it runs **before** your model is loaded. Use it to install system packages and Python dependencies.
+- If a `requirements.txt` is provided, dependencies are auto-installed via `pip install -r requirements.txt` after `setup.sh`.
+- **Tip**: For NeMo-based models (parakeet, canary_qwen), we recommend using `setup.sh` to create a clean virtual environment and install dependencies there, to avoid CUDA/numpy conflicts with the base conda environment. See the `parakeet/` or `canary_qwen/` baselines for examples.
 
 ## Notes
 
 - The `Model` class name must be exactly `Model`.
 - `predict()` receives an absolute path to a `.wav` file and must return a string.
 - Do **not** hardcode file paths; use only the `wav_path` argument passed to `predict()`.
-

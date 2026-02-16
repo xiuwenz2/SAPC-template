@@ -24,20 +24,31 @@ def get_parser():
     p = argparse.ArgumentParser(
         description="ASR evaluation (same logic as scoring.py, without Codabench API)"
     )
-    p.add_argument("--split", required=True,
-                   help="Split name (e.g. Dev-all, test1)")
-    p.add_argument("--hyp-csv", required=True,
-                   help="CSV with hypothesis predictions (must have 'id' column)")
-    p.add_argument("--hyp-col", default="raw_hypos",
-                   help="Hypothesis column name (default: raw_hypos)")
-    p.add_argument("--manifest-csv", required=True,
-                   help="Manifest CSV with 'id' column (defines utterance order)")
-    p.add_argument("--ref-dir", required=True,
-                   help="Directory with pre-computed ref .trn files")
-    p.add_argument("--eval-dir", required=True,
-                   help="Output / working directory")
-    p.add_argument("--out-json", default=None,
-                   help="Output JSON path (default: eval-dir/metrics.SPLIT.json)")
+    p.add_argument("--split", required=True, help="Split name (e.g. Dev-all, test1)")
+    p.add_argument(
+        "--hyp-csv",
+        required=True,
+        help="CSV with hypothesis predictions (must have 'id' column)",
+    )
+    p.add_argument(
+        "--hyp-col",
+        default="raw_hypos",
+        help="Hypothesis column name (default: raw_hypos)",
+    )
+    p.add_argument(
+        "--manifest-csv",
+        required=True,
+        help="Manifest CSV with 'id' column (defines utterance order)",
+    )
+    p.add_argument(
+        "--ref-dir", required=True, help="Directory with pre-computed ref .trn files"
+    )
+    p.add_argument("--eval-dir", required=True, help="Output / working directory")
+    p.add_argument(
+        "--out-json",
+        default=None,
+        help="Output JSON path (default: eval-dir/metrics.SPLIT.json)",
+    )
     return p
 
 
@@ -45,30 +56,31 @@ def get_parser():
 # I/O helpers
 # ====================================================================
 
+
 def load_manifest_ids(csv_path: str) -> List[str]:
     """Read manifest CSV and return ordered list of IDs."""
     ids = []
-    with open(csv_path, 'r', encoding='utf-8') as f:
+    with open(csv_path, "r", encoding="utf-8") as f:
         for row in csv.DictReader(f):
-            ids.append(row['id'])
+            ids.append(row["id"])
     return ids
 
 
 def load_predictions(csv_path: str, hyp_col: str) -> Dict[str, str]:
     """Load predictions (id -> raw_hyp_text) from CSV file."""
     preds = {}
-    with open(csv_path, 'r', encoding='utf-8') as f:
+    with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            uid = row['id']
-            text = row.get(hyp_col, '')
+            uid = row["id"]
+            text = row.get(hyp_col, "")
             preds[uid] = text
     return preds
 
 
 def write_trn(texts: List[str], ids: List[str], path: str):
     """Write text + uttid to TRN file."""
-    with open(path, 'w', encoding='utf-8') as f:
+    with open(path, "w", encoding="utf-8") as f:
         for text, uid in zip(texts, ids):
             f.write(f"{text} ({uid})\n")
 
@@ -77,6 +89,7 @@ def write_trn(texts: List[str], ids: List[str], path: str):
 # sclite runner
 # ====================================================================
 
+
 def run_sclite(ref_trn: str, hyp_trn: str, sgml_out: str) -> bool:
     """
     Run sclite alignment: ref vs hyp -> SGML.
@@ -84,16 +97,29 @@ def run_sclite(ref_trn: str, hyp_trn: str, sgml_out: str) -> bool:
     """
     try:
         result = subprocess.run(
-            ['sclite', '-r', ref_trn, 'trn', '-h', hyp_trn, 'trn',
-             '-i', 'wsj', '-o', 'all', 'sgml'],
-            capture_output=True, timeout=600,
+            [
+                "sclite",
+                "-r",
+                ref_trn,
+                "trn",
+                "-h",
+                hyp_trn,
+                "trn",
+                "-i",
+                "wsj",
+                "-o",
+                "all",
+                "sgml",
+            ],
+            capture_output=True,
+            timeout=600,
         )
         # sclite writes <hyp_trn>.sgml
-        generated_sgml = hyp_trn + '.sgml'
+        generated_sgml = hyp_trn + ".sgml"
         if os.path.isfile(generated_sgml):
             shutil.move(generated_sgml, sgml_out)
             # Cleanup other sclite artifacts
-            for ext in ['.sys', '.raw', '.pra']:
+            for ext in [".sys", ".raw", ".pra"]:
                 artifact = hyp_trn + ext
                 if os.path.isfile(artifact):
                     os.remove(artifact)
@@ -108,37 +134,42 @@ def run_sclite(ref_trn: str, hyp_trn: str, sgml_out: str) -> bool:
 # Main scoring
 # ====================================================================
 
-def score_split_with_sclite(split: str, manifest_ids: List[str],
-                            hyp_normalized: List[str],
-                            reference_dir: str, WORK_DIR: str) -> Optional[dict]:
+
+def score_split_with_sclite(
+    split: str,
+    manifest_ids: List[str],
+    hyp_normalized: List[str],
+    reference_dir: str,
+    WORK_DIR: str,
+) -> Optional[dict]:
     """Score a split using sclite alignment + SGML parsing."""
     from compute_metrics import compute_from_sgml
 
-    SCTK_DIR = os.path.join(WORK_DIR, 'sctk')
+    SCTK_DIR = os.path.join(WORK_DIR, "sctk")
     os.makedirs(SCTK_DIR, exist_ok=True)
 
     # Sequential utt IDs matching pre-computed ref .trn files
     utt_ids = [f"utt{i:06d}" for i in range(1, len(manifest_ids) + 1)]
 
     # Write normalized hyp to .trn
-    hyp_trn = os.path.join(WORK_DIR, f'hyp.{split}.norm.trn')
+    hyp_trn = os.path.join(WORK_DIR, f"hyp.{split}.norm.trn")
     write_trn(hyp_normalized, utt_ids, hyp_trn)
 
     # Pre-computed ref .trn files (in reference directory)
-    ref1_trn = os.path.join(reference_dir, f'ref1.{split}.norm.trn')
-    ref2_trn = os.path.join(reference_dir, f'ref2.{split}.norm.trn')
+    ref1_trn = os.path.join(reference_dir, f"ref1.{split}.norm.trn")
+    ref2_trn = os.path.join(reference_dir, f"ref2.{split}.norm.trn")
 
     if not os.path.isfile(ref1_trn) or not os.path.isfile(ref2_trn):
         print(f"WARNING: Pre-normalized ref .trn files not found for {split}")
         return None
 
     # Run sclite
-    sgml1 = os.path.join(SCTK_DIR, f'{split}.ref1.sgml')
-    sgml2 = os.path.join(SCTK_DIR, f'{split}.ref2.sgml')
+    sgml1 = os.path.join(SCTK_DIR, f"{split}.ref1.sgml")
+    sgml2 = os.path.join(SCTK_DIR, f"{split}.ref2.sgml")
 
     # Need separate hyp copies for each sclite run (sclite writes <hyp>.sgml)
-    hyp_trn_1 = os.path.join(WORK_DIR, f'hyp.{split}.ref1.norm.trn')
-    hyp_trn_2 = os.path.join(WORK_DIR, f'hyp.{split}.ref2.norm.trn')
+    hyp_trn_1 = os.path.join(WORK_DIR, f"hyp.{split}.ref1.norm.trn")
+    hyp_trn_2 = os.path.join(WORK_DIR, f"hyp.{split}.ref2.norm.trn")
     shutil.copy2(hyp_trn, hyp_trn_1)
     shutil.copy2(hyp_trn, hyp_trn_2)
 
@@ -161,7 +192,7 @@ def main():
 
     os.makedirs(WORK_DIR, exist_ok=True)
 
-    out_json = args.out_json or os.path.join(WORK_DIR, f'metrics.{split}.json')
+    out_json = args.out_json or os.path.join(WORK_DIR, f"metrics.{split}.json")
 
     print(f"sclite: {shutil.which('sclite')}")
 
@@ -186,25 +217,26 @@ def main():
     print(f"Matched {matched} / {len(manifest_ids)} predictions")
 
     # 4) Score via sclite
-    result = score_split_with_sclite(split, manifest_ids, hyp_normalized,
-                                     reference_dir, WORK_DIR)
+    result = score_split_with_sclite(
+        split, manifest_ids, hyp_normalized, reference_dir, WORK_DIR
+    )
 
     if result is None:
         print(f"ERROR: sclite scoring failed for split {split}")
         sys.exit(1)
 
-    wer = result['wer']
-    cer = result['cer']
-    n_utts = result['n_utts']
+    wer = result["wer"]
+    cer = result["cer"]
+    n_utts = result["n_utts"]
     print(f"#utts: {n_utts}")
     print(f"WER: {wer:.4f}  ({wer*100:.2f}%)")
     print(f"CER: {cer:.4f}  ({cer*100:.2f}%)")
 
     # Save
-    with open(out_json, 'w') as f:
+    with open(out_json, "w") as f:
         json.dump(result, f, indent=2)
     print(f"Written to: {out_json}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -95,7 +95,8 @@ class EnglishNumberNormalizer:
         }
         # fmt: on
         self.ones_plural = {
-            "sixes" if name == "six" else name + "s": (value, "s") for name, value in self.ones.items()
+            "sixes" if name == "six" else name + "s": (value, "s")
+            for name, value in self.ones.items()
         }
         self.ones_ordinal = {
             "zeroth": (0, "th"),
@@ -122,8 +123,13 @@ class EnglishNumberNormalizer:
             "eighty": 80,
             "ninety": 90,
         }
-        self.tens_plural = {name.replace("y", "ies"): (value, "s") for name, value in self.tens.items()}
-        self.tens_ordinal = {name.replace("y", "ieth"): (value, "th") for name, value in self.tens.items()}
+        self.tens_plural = {
+            name.replace("y", "ies"): (value, "s") for name, value in self.tens.items()
+        }
+        self.tens_ordinal = {
+            name.replace("y", "ieth"): (value, "th")
+            for name, value in self.tens.items()
+        }
         self.tens_suffixed = {**self.tens_plural, **self.tens_ordinal}
 
         self.multipliers = {
@@ -140,9 +146,16 @@ class EnglishNumberNormalizer:
             "nonillion": 1_000_000_000_000_000_000_000_000_000_000,
             "decillion": 1_000_000_000_000_000_000_000_000_000_000_000,
         }
-        self.multipliers_plural = {name + "s": (value, "s") for name, value in self.multipliers.items()}
-        self.multipliers_ordinal = {name + "th": (value, "th") for name, value in self.multipliers.items()}
-        self.multipliers_suffixed = {**self.multipliers_plural, **self.multipliers_ordinal}
+        self.multipliers_plural = {
+            name + "s": (value, "s") for name, value in self.multipliers.items()
+        }
+        self.multipliers_ordinal = {
+            name + "th": (value, "th") for name, value in self.multipliers.items()
+        }
+        self.multipliers_suffixed = {
+            **self.multipliers_plural,
+            **self.multipliers_ordinal,
+        }
         self.decimals = {*self.ones, *self.tens, *self.zeros}
 
         self.preceding_prefixers = {
@@ -161,7 +174,10 @@ class EnglishNumberNormalizer:
             "cent": "¢",
             "cents": "¢",
         }
-        self.prefixes = set(list(self.preceding_prefixers.values()) + list(self.following_prefixers.values()))
+        self.prefixes = set(
+            list(self.preceding_prefixers.values())
+            + list(self.following_prefixers.values())
+        )
         self.suffixers = {
             "per": {"cent": "%"},
             "percent": "%",
@@ -252,7 +268,9 @@ class EnglishNumberNormalizer:
                 if value is None:
                     value = ones
                 elif isinstance(value, str) or prev in self.ones:
-                    if prev in self.tens and ones < 10:  # replace the last zero with the digit
+                    if (
+                        prev in self.tens and ones < 10
+                    ):  # replace the last zero with the digit
                         value = value[:-1] + str(ones)
                     else:
                         value = str(value) + str(ones)
@@ -489,7 +507,7 @@ class EnglishSpellingNormalizer:
 
 
 class EnglishTextNormalizer:
-    
+
     def __init__(self, english_spelling_mapping=english_spelling_normalizer):
         self.ignore_patterns = r"\b(hmm|mm|mhm|mmm|uh|um)\b"
         self.replacers = {
@@ -558,48 +576,49 @@ class EnglishTextNormalizer:
         Handles multiple formats: spaces, dots, dashes, tildes.
         Example: "T V" -> "TV", "U.S.A" -> "USA", "S-U-C-C-E-E-D" -> "SUCCEED"
         """
+
         def merge_letters(match):
             # Extract all letters and merge them
             sequence = match.group(0)
-            letters = re.findall(r'[A-Za-z]', sequence)
+            letters = re.findall(r"[A-Za-z]", sequence)
             if len(letters) > 1:
-                return ''.join(letters)
+                return "".join(letters)
             return sequence
-        
+
         def merge_tilde_letters(match):
             # Merge adjacent ~letter patterns into one word (removing tildes)
             sequence = match.group(0)
-            letters = re.findall(r'~([A-Za-z])', sequence)
+            letters = re.findall(r"~([A-Za-z])", sequence)
             if len(letters) > 1:
-                return ''.join(letters)
+                return "".join(letters)
             return sequence
-        
+
         # Rule 1: Match sequences of single uppercase letters separated by spaces
         # Example: "T V" -> "TV", "A B C" -> "ABC"
         # (?<!') ensures we don't match letters that are part of contractions like "HERE'S"
-        pattern1 = r'(?<!\')\b([A-Z])\b(?:\s+\b([A-Z])\b)+'
+        pattern1 = r"(?<!\')\b([A-Z])\b(?:\s+\b([A-Z])\b)+"
         text = re.sub(pattern1, merge_letters, text)
-        
+
         # Rule 2: Match sequences of single lowercase letters separated by spaces
         # Example: "g o v e r n m e n t" -> "government"
-        pattern2 = r'(?<!\')\b([a-z])\b(?:\s+\b([a-z])\b)+'
+        pattern2 = r"(?<!\')\b([a-z])\b(?:\s+\b([a-z])\b)+"
         text = re.sub(pattern2, merge_letters, text)
-        
+
         # Rule 3: Match letters separated by dots
         # Example: "U.S" -> "US", "U.S.A" -> "USA", "a.m" -> "am"
-        pattern3 = r'\b([A-Za-z])\.([A-Za-z])(?:\.[A-Za-z])*\b'
+        pattern3 = r"\b([A-Za-z])\.([A-Za-z])(?:\.[A-Za-z])*\b"
         text = re.sub(pattern3, merge_letters, text)
-        
+
         # Rule 4: Match letters separated by dashes
         # Example: "S-U-C-C-E-E-D" -> "SUCCEED", "g-o-v-e-r-n" -> "govern"
-        pattern4 = r'\b([A-Za-z])-([A-Za-z])(?:-[A-Za-z])*\b'
+        pattern4 = r"\b([A-Za-z])-([A-Za-z])(?:-[A-Za-z])*\b"
         text = re.sub(pattern4, merge_letters, text)
-        
+
         # Rule 5: Match adjacent ~letter patterns and merge them
         # Example: "~C ~B" -> "CB", "(~C ~B ~A)" -> "(CBA)"
-        pattern5 = r'~[A-Za-z](?:\s+~[A-Za-z])+'
+        pattern5 = r"~[A-Za-z](?:\s+~[A-Za-z])+"
         text = re.sub(pattern5, merge_tilde_letters, text)
-        
+
         return text
 
     def _disambiguate_st(self, text: str) -> str:
@@ -607,78 +626,113 @@ class EnglishTextNormalizer:
         Disambiguate 'St.' abbreviation: saint if followed by capitalized word, else street.
         Only matches "St." (with period).
         """
+
         def replace_st(match):
             after = match.group(1)
             # If followed by capitalized word -> saint, else -> street
-            if re.match(r'\s*[A-Z]', after):
+            if re.match(r"\s*[A-Z]", after):
                 return "saint " + after.lstrip()
             return "street " + after.lstrip()
-        
-        return re.sub(r'\bSt\.(\s*\S*)', replace_st, text)
 
-    def norm(self, s: str, apply_markup: bool = False, remove_parentheses: Optional[bool] = None):
+        return re.sub(r"\bSt\.(\s*\S*)", replace_st, text)
+
+    def norm(
+        self,
+        s: str,
+        apply_markup: bool = False,
+        remove_parentheses: Optional[bool] = None,
+    ):
         # Merge uppercase abbreviations BEFORE lowercasing
         s = self._merge_uppercase_abbreviations(s)
         # Disambiguate "st" (saint vs street) BEFORE lowercasing
         s = self._disambiguate_st(s)
-        
+
         s = s.lower()
-        s = expand_common_is_contractions(s) # <--- ADDED THIS LINE BACK IN
+        s = expand_common_is_contractions(s)  # <--- ADDED THIS LINE BACK IN
         if apply_markup:
             # s = re.sub(r"[<\[][^>\]]*[>\]]", "", s)  # remove words between brackets
             s = re.sub(r"\[(.*?)\]", " ", s)  # remove words between brackets
-            
+
             if re.findall(r"(.*?)\]", s):
-                s = re.sub(r"(.*?)\]", " ", s)  # Handle "...]" 
+                s = re.sub(r"(.*?)\]", " ", s)  # Handle "...]"
 
             # Handle {...}
             content = re.findall(r"\{(.*?)\}", s)
             if len(content) > 0:
                 content_ = []
                 for con in content:
-                    if re.findall(r"(.+(?=:))", con) and re.findall(r"(.+(?=:))", con)[0] == "w":
+                    if (
+                        re.findall(r"(.+(?=:))", con)
+                        and re.findall(r"(.+(?=:))", con)[0] == "w"
+                    ):
                         if len(re.findall(r"\d+", con)) == 0:
                             content_.append(" ")
                             continue
                         assert len(re.findall(r"\d+", con)) == 1
                         num_unk = int(re.findall(r"\d+", con)[0])
                         content_.append(" ".join(["UNK" for _ in range(num_unk)]))
-                    elif (re.findall(r"(.+(?=:))", con) and re.findall(r"(.+(?=:))", con)[0] == "u") or con == " ":
+                    elif (
+                        re.findall(r"(.+(?=:))", con)
+                        and re.findall(r"(.+(?=:))", con)[0] == "u"
+                    ) or con == " ":
                         content_.append(" ".join(["UNK" for _ in range(1)]))
                     else:
                         content_.append(re.sub(r"(.+(?=:))", " ", con))
-                mapping = {content[i]: re.sub(":", " ", content_[i]) for i in range(len(content))}
-                s = re.sub(r"\{(.*?)\}", lambda x: "{"+mapping[x.group()[1:-1]]+"}", s)
-            
+                mapping = {
+                    content[i]: re.sub(":", " ", content_[i])
+                    for i in range(len(content))
+                }
+                s = re.sub(
+                    r"\{(.*?)\}", lambda x: "{" + mapping[x.group()[1:-1]] + "}", s
+                )
+
             # s = re.sub(r"\(([^)]+?)\)", "", s)  # remove words between parenthesis
             # Handle parentheses
             if remove_parentheses:
                 content = re.findall(r"\((.*?)\)", s)
                 if len(content) > 0:
-                    content_ = [re.sub(r"(.+(?=:))", " ", con) if re.findall(r"(.+(?=:))", con) else "" for con in content]
-                    mapping = {content[i]: re.sub(":", " ", content_[i]) for i in range(len(content))}
+                    content_ = [
+                        (
+                            re.sub(r"(.+(?=:))", " ", con)
+                            if re.findall(r"(.+(?=:))", con)
+                            else ""
+                        )
+                        for con in content
+                    ]
+                    mapping = {
+                        content[i]: re.sub(":", " ", content_[i])
+                        for i in range(len(content))
+                    }
                     s = re.sub(r"\((.*?)\)", lambda x: mapping[x.group()[1:-1]], s)
             else:
-                s = re.sub(r"\((.*?)\)", lambda x: "(" + re.sub(r"(.+(?=:))", " ", x.group()[1:-1]) + ")", s)
-            
+                s = re.sub(
+                    r"\((.*?)\)",
+                    lambda x: "(" + re.sub(r"(.+(?=:))", " ", x.group()[1:-1]) + ")",
+                    s,
+                )
+
         s = re.sub(self.ignore_patterns, "", s)
-        
+
         # Remove quotation marks (preserves apostrophes in contractions like can't, o'clock)
-        s = re.sub(r'["""]', ' ', s)  # all double quotes -> space
-        s = re.sub(r"(?<!\w)'|'(?!\w)", ' ', s)  # single quotes at word boundaries -> space
+        s = re.sub(r'["""]', " ", s)  # all double quotes -> space
+        s = re.sub(
+            r"(?<!\w)'|'(?!\w)", " ", s
+        )  # single quotes at word boundaries -> space
 
         for pattern, replacement in self.replacers.items():
             s = re.sub(pattern, replacement, s)
 
         s = re.sub(r"(\d),(\d)", r"\1\2", s)  # remove commas between digits
         s = re.sub(r"\.+", ".", s)  # collapse multiple periods into one
-        
+
         s = re.sub(r"\.(?!\d)", " ", s)  # remove periods not followed by digits
-        s = remove_symbols_and_diacritics(s, keep=".'%$¢€£")  # keep some symbols for numerics <-- MODIFIED THIS LINE
+        s = remove_symbols_and_diacritics(
+            s, keep=".'%$¢€£"
+        )  # keep some symbols for numerics <-- MODIFIED THIS LINE
 
         s = self.standardize_numbers(s)
         s = self.standardize_spellings(s)
-        
+
         # Remove decimal points from non-numeric contexts
         # This preserves legitimate decimal numbers that survived standardize_numbers
         s = re.sub(r"\.(?!\d)", " ", s)  # remove periods not followed by digits
@@ -687,27 +741,29 @@ class EnglishTextNormalizer:
         s = re.sub(r"[.$¢€£]([^0-9])", r" \1", s)
         s = re.sub(r"([^0-9])%", r"\1 ", s)
 
-        s = re.sub(r"\s+", " ", s)  # replace any successive whitespace characters with a space
+        s = re.sub(
+            r"\s+", " ", s
+        )  # replace any successive whitespace characters with a space
 
         return s
 
 
-# list of 's contractions 
+# list of 's contractions
 COMMON_IS_CONTRACTIONS = {
-	"it's",
-	"what's",
-	"where's",
-	"when's",
-	"why's",
-	"how's",
-	"who's",
-	"that's",
-	"there's",
-	"here's",
-	"she's",
-	"he's",
-	"let's",
-	"who's",
+    "it's",
+    "what's",
+    "where's",
+    "when's",
+    "why's",
+    "how's",
+    "who's",
+    "that's",
+    "there's",
+    "here's",
+    "she's",
+    "he's",
+    "let's",
+    "who's",
     "coffee's",
 }
 
@@ -715,14 +771,15 @@ _S_CONTRACTION_PATTERN = re.compile(r"\b(\w+)'s\b", flags=re.IGNORECASE)
 
 
 def expand_common_is_contractions(text: str) -> str:
-	"""
-	Replace only the canonical `'s` contractions with “is” so other possessives (e.g. “Mom’s”) stay unchanged.
-	"""
-	def _replacer(match: re.Match[str]) -> str:
-		token = match.group(0)
-		if token.lower() in COMMON_IS_CONTRACTIONS:
-			core = match.group(1)
-			return f"{core} is"
-		return token
+    """
+    Replace only the canonical `'s` contractions with “is” so other possessives (e.g. “Mom’s”) stay unchanged.
+    """
 
-	return _S_CONTRACTION_PATTERN.sub(_replacer, text)
+    def _replacer(match: re.Match[str]) -> str:
+        token = match.group(0)
+        if token.lower() in COMMON_IS_CONTRACTIONS:
+            core = match.group(1)
+            return f"{core} is"
+        return token
+
+    return _S_CONTRACTION_PATTERN.sub(_replacer, text)

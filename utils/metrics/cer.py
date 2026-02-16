@@ -28,6 +28,7 @@ from torchmetrics.functional.text.helper import _edit_distance
 if not _MATPLOTLIB_AVAILABLE:
     __doctest_skip__ = ["CharErrorRate.plot"]
 
+
 def _cer_update(
     preds: Union[str, list[str]],
     target: Union[str, list[str]],
@@ -62,6 +63,7 @@ def _cer_update(
         errors += ed
         total += tgt_len
     return errors, total
+
 
 def _cer_update_min_two_refs(
     preds: Union[str, list[str]],
@@ -106,6 +108,7 @@ def _cer_update_min_two_refs(
             total += 0.5 * (len1 + len2)
     return errors, total
 
+
 def _cer_compute(errors: Tensor, total: Tensor) -> Tensor:
     """Compute the Character error rate.
 
@@ -118,6 +121,7 @@ def _cer_compute(errors: Tensor, total: Tensor) -> Tensor:
 
     """
     return errors / total
+
 
 class CharErrorRate(Metric):
     r"""Character Error Rate (`CER`_) is a metric of the performance of an automatic speech recognition (ASR) system.
@@ -180,7 +184,9 @@ class CharErrorRate(Metric):
         self.add_state("total", tensor(0, dtype=torch.float), dist_reduce_fx="sum")
         self.clip_at_one = clip_at_one
 
-    def update(self, preds: Union[str, list[str]], target: Union[str, list[str]]) -> None:
+    def update(
+        self, preds: Union[str, list[str]], target: Union[str, list[str]]
+    ) -> None:
         """Update state with predictions and targets."""
         errors, total = _cer_update(preds, target, clip_at_one=self.clip_at_one)
         self.errors += errors
@@ -191,7 +197,9 @@ class CharErrorRate(Metric):
         return _cer_compute(self.errors, self.total)
 
     def plot(
-        self, val: Optional[Union[Tensor, Sequence[Tensor]]] = None, ax: Optional[_AX_TYPE] = None
+        self,
+        val: Optional[Union[Tensor, Sequence[Tensor]]] = None,
+        ax: Optional[_AX_TYPE] = None,
     ) -> _PLOT_OUT_TYPE:
         """Plot a single or multiple values from the metric.
 
@@ -233,6 +241,7 @@ class CharErrorRate(Metric):
 
         """
         return self._plot(val, ax)
+
 
 class CharErrorRateMinTwoRefs(CharErrorRate):
     """Character error rate with two references per prediction.

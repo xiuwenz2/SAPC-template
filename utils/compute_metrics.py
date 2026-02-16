@@ -58,7 +58,9 @@ def parse_sgml_csdi(
 
             # Next non-empty, non-tag line is the alignment line
             j = i + 1
-            while j < len(lines) and (not lines[j].strip() or lines[j].lstrip().startswith("<")):
+            while j < len(lines) and (
+                not lines[j].strip() or lines[j].lstrip().startswith("<")
+            ):
                 j += 1
             if j >= len(lines):
                 break
@@ -149,17 +151,28 @@ def parse_sgml_csdi(
 
 # ---------- API ----------
 
+
 def compute_from_sgml(sgml_ref1: str, sgml_ref2: str):
     """
     Compute min-two-refs WER/CER from two SGML files.
     Called by scoring.py (bundle) or directly as a library function.
     """
-    preds_ref1, target_ref1 = parse_sgml_csdi(sgml_ref1, process_unk=True, unk_token="unk")
-    preds_ref2, target_ref2 = parse_sgml_csdi(sgml_ref2, process_unk=True, unk_token="unk")
+    preds_ref1, target_ref1 = parse_sgml_csdi(
+        sgml_ref1, process_unk=True, unk_token="unk"
+    )
+    preds_ref2, target_ref2 = parse_sgml_csdi(
+        sgml_ref2, process_unk=True, unk_token="unk"
+    )
 
     if preds_ref1 != preds_ref2:
-        print("ERROR: preds from sgml-ref1 and sgml-ref2 are not identical!", file=sys.stderr)
-        print(f"  len(preds_ref1) = {len(preds_ref1)}, len(preds_ref2) = {len(preds_ref2)}", file=sys.stderr)
+        print(
+            "ERROR: preds from sgml-ref1 and sgml-ref2 are not identical!",
+            file=sys.stderr,
+        )
+        print(
+            f"  len(preds_ref1) = {len(preds_ref1)}, len(preds_ref2) = {len(preds_ref2)}",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     preds = preds_ref1
@@ -179,10 +192,11 @@ def compute_from_sgml(sgml_ref1: str, sgml_ref2: str):
 
 # ---------- CLI ----------
 
+
 def get_parser():
     p = argparse.ArgumentParser(
         description="Stage3: reconstruct ref/hyp from SGML PATH alignment "
-                    "and compute metrics (CharErrorRate / WordErrorRate)"
+        "and compute metrics (CharErrorRate / WordErrorRate)"
     )
     p.add_argument(
         "--sgml-ref1",

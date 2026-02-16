@@ -3,6 +3,14 @@
 Baseline: NVIDIA Canary-Qwen 2.5B (NeMo SALM).
 Participants must implement a Model class with a predict(wav_path) method.
 """
+
+# ── Use packages from the clean venv created by setup.sh ──
+import sys, os
+
+_venv_site = "/opt/canary_venv/lib/python3.11/site-packages"
+if os.path.isdir(_venv_site):
+    sys.path.insert(0, _venv_site)
+
 import torch
 from nemo.collections.speechlm2.models import SALM
 
@@ -11,7 +19,9 @@ class Model:
     """ASR Model using NeMo Canary-Qwen-2.5B."""
 
     def __init__(self):
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        if not torch.cuda.is_available():
+            raise RuntimeError("CUDA is not available — this track requires GPU.")
+        device = "cuda"
         print(f"Loading canary-qwen-2.5b on {device}")
 
         self.model = SALM.from_pretrained("nvidia/canary-qwen-2.5b")
@@ -49,4 +59,3 @@ class Model:
 
         text = self.model.tokenizer.ids_to_text(answer_ids[0].cpu())
         return text.strip()
-

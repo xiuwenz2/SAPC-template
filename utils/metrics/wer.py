@@ -28,6 +28,7 @@ from torchmetrics.functional.text.helper import _edit_distance
 if not _MATPLOTLIB_AVAILABLE:
     __doctest_skip__ = ["WordErrorRate.plot"]
 
+
 def _wer_update(
     preds: Union[str, list[str]],
     target: Union[str, list[str]],
@@ -62,6 +63,7 @@ def _wer_update(
         errors += ed
         total += tgt_len
     return errors, total
+
 
 def _wer_update_min_two_refs(
     preds: Union[str, list[str]],
@@ -106,6 +108,7 @@ def _wer_update_min_two_refs(
             total += 0.5 * (len1 + len2)
     return errors, total
 
+
 def _wer_compute(errors: Tensor, total: Tensor) -> Tensor:
     """Compute the word error rate.
 
@@ -118,6 +121,7 @@ def _wer_compute(errors: Tensor, total: Tensor) -> Tensor:
 
     """
     return errors / total
+
 
 class WordErrorRate(Metric):
     r"""Word error rate (`WordErrorRate`_) is a common metric of the performance of an automatic speech recognition.
@@ -179,7 +183,9 @@ class WordErrorRate(Metric):
         self.add_state("total", tensor(0, dtype=torch.float), dist_reduce_fx="sum")
         self.clip_at_one = clip_at_one
 
-    def update(self, preds: Union[str, list[str]], target: Union[str, list[str]]) -> None:
+    def update(
+        self, preds: Union[str, list[str]], target: Union[str, list[str]]
+    ) -> None:
         """Update state with predictions and targets."""
         errors, total = _wer_update(preds, target, clip_at_one=self.clip_at_one)
         self.errors += errors
@@ -190,7 +196,9 @@ class WordErrorRate(Metric):
         return _wer_compute(self.errors, self.total)
 
     def plot(
-        self, val: Optional[Union[Tensor, Sequence[Tensor]]] = None, ax: Optional[_AX_TYPE] = None
+        self,
+        val: Optional[Union[Tensor, Sequence[Tensor]]] = None,
+        ax: Optional[_AX_TYPE] = None,
     ) -> _PLOT_OUT_TYPE:
         """Plot a single or multiple values from the metric.
 
@@ -233,12 +241,14 @@ class WordErrorRate(Metric):
         """
         return self._plot(val, ax)
 
+
 class WordErrorRateMinTwoRefs(WordErrorRate):
     """Word error rate with two references per prediction.
 
     For each sample, given (target1, target2, pred), compute WER(pred, target1)
     and WER(pred, target2), then use the smaller one to accumulate global WER.
     """
+
     def __init__(
         self,
         clip_at_one: bool = True,

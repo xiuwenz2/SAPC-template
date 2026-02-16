@@ -20,16 +20,19 @@ from tqdm import tqdm
 
 def parse_args():
     p = argparse.ArgumentParser(description="Resample WAVs in parallel.")
-    p.add_argument("--input_dir", required=True,
-                   help="Input directory containing WAV files.")
-    p.add_argument("--output_dir", required=True,
-                   help="Output directory for resampled WAV files.")
-    p.add_argument("--sr", type=int, default=16000,
-                   help="Target sample rate.")
-    p.add_argument("--workers", type=int, default=32,
-                   help="Number of processes.")
-    p.add_argument("--skip-existing", action="store_true",
-                   help="Skip if target file already exists.")
+    p.add_argument(
+        "--input_dir", required=True, help="Input directory containing WAV files."
+    )
+    p.add_argument(
+        "--output_dir", required=True, help="Output directory for resampled WAV files."
+    )
+    p.add_argument("--sr", type=int, default=16000, help="Target sample rate.")
+    p.add_argument("--workers", type=int, default=32, help="Number of processes.")
+    p.add_argument(
+        "--skip-existing",
+        action="store_true",
+        help="Skip if target file already exists.",
+    )
     return p.parse_args()
 
 
@@ -46,7 +49,9 @@ def target_path_for(src_path: Path, input_dir: Path, output_dir: Path) -> Path:
         return output_dir / src_path.name
 
 
-def process_one(src: Path, input_dir: Path, output_dir: Path, tgt_sr: int, skip_existing: bool) -> tuple[str, str]:
+def process_one(
+    src: Path, input_dir: Path, output_dir: Path, tgt_sr: int, skip_existing: bool
+) -> tuple[str, str]:
     """
     Process a single WAV.
     Returns (status, message_or_path), where status in {"ok", "skip", "miss", "fail"}.
@@ -88,7 +93,9 @@ def collect_wavs(input_dir: Path):
     """
     Recursively collect all .wav under input_dir.
     """
-    return list(input_dir.rglob("*.wav"))  # list so we can take len() and iterate multiple times
+    return list(
+        input_dir.rglob("*.wav")
+    )  # list so we can take len() and iterate multiple times
 
 
 def main():
@@ -101,7 +108,7 @@ def main():
     args = parse_args()
     input_dir = Path(args.input_dir)
     output_dir = Path(args.output_dir)
-    
+
     print(f"Input:  {input_dir}")
     print(f"Output: {output_dir}")
 
@@ -116,10 +123,14 @@ def main():
 
     with ProcessPoolExecutor(max_workers=args.workers) as ex:
         futures = [
-            ex.submit(process_one, src, input_dir, output_dir, args.sr, args.skip_existing)
+            ex.submit(
+                process_one, src, input_dir, output_dir, args.sr, args.skip_existing
+            )
             for src in wavs
         ]
-        for fut in tqdm(as_completed(futures), total=total, desc="Resampling", unit="file"):
+        for fut in tqdm(
+            as_completed(futures), total=total, desc="Resampling", unit="file"
+        ):
             status, msg = fut.result()
             if status == "ok":
                 ok += 1

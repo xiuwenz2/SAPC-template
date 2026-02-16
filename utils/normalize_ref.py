@@ -21,8 +21,16 @@ def get_parser():
             "from a CSV column. Output .trn files and/or add columns to CSV."
         )
     )
-    p.add_argument("--csv", required=True, help="Input CSV, e.g. eval/dev.csv or manifest/Train.csv")
-    p.add_argument("--ref-col", default="raw_trans", help="Reference column name (default: raw_trans). Use 'text' for manifest CSV.")
+    p.add_argument(
+        "--csv",
+        required=True,
+        help="Input CSV, e.g. eval/dev.csv or manifest/Train.csv",
+    )
+    p.add_argument(
+        "--ref-col",
+        default="raw_trans",
+        help="Reference column name (default: raw_trans). Use 'text' for manifest CSV.",
+    )
     p.add_argument(
         "--out-ref1",
         default=None,
@@ -37,7 +45,7 @@ def get_parser():
         "--out-csv",
         default=None,
         help="Output CSV path: same rows with two extra columns "
-             "norm_text_with_disfluency (ref1) and norm_text_without_disfluency (ref2).",
+        "norm_text_with_disfluency (ref1) and norm_text_without_disfluency (ref2).",
     )
     return p
 
@@ -52,7 +60,10 @@ def main():
     out_csv_mode = bool(args.out_csv)
     out_trn_mode = bool(args.out_ref1 and args.out_ref2)
     if not out_csv_mode and not out_trn_mode:
-        print("ERROR: set either --out-csv or both --out-ref1 and --out-ref2", file=sys.stderr)
+        print(
+            "ERROR: set either --out-csv or both --out-ref1 and --out-ref2",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     normalizer = EnglishTextNormalizer()
@@ -61,17 +72,25 @@ def main():
 
     def open_ref_files():
         if out_trn_mode:
-            return open(args.out_ref1, "w", encoding="utf-8"), open(args.out_ref2, "w", encoding="utf-8")
+            return open(args.out_ref1, "w", encoding="utf-8"), open(
+                args.out_ref2, "w", encoding="utf-8"
+            )
         return None, None
 
     with open(args.csv, "r", encoding="utf-8") as f_csv:
         reader = csv.DictReader(f_csv)
         if args.ref_col not in reader.fieldnames:
-            print(f"ERROR: ref-col '{args.ref_col}' not in CSV header: {reader.fieldnames}", file=sys.stderr)
+            print(
+                f"ERROR: ref-col '{args.ref_col}' not in CSV header: {reader.fieldnames}",
+                file=sys.stderr,
+            )
             sys.exit(1)
 
         if out_csv_mode:
-            csv_fieldnames = list(reader.fieldnames) + ["norm_text_with_disfluency", "norm_text_without_disfluency"]
+            csv_fieldnames = list(reader.fieldnames) + [
+                "norm_text_with_disfluency",
+                "norm_text_without_disfluency",
+            ]
 
         f_ref1, f_ref2 = open_ref_files()
         try:
@@ -112,10 +131,14 @@ def main():
         if out_dir:
             os.makedirs(out_dir, exist_ok=True)
         with open(args.out_csv, "w", encoding="utf-8", newline="") as f_out:
-            writer = csv.DictWriter(f_out, fieldnames=csv_fieldnames, extrasaction="ignore")
+            writer = csv.DictWriter(
+                f_out, fieldnames=csv_fieldnames, extrasaction="ignore"
+            )
             writer.writeheader()
             writer.writerows(csv_rows)
-        print(f"[normalize_ref] Wrote CSV with norm columns: {args.out_csv} (rows={len(csv_rows)})")
+        print(
+            f"[normalize_ref] Wrote CSV with norm columns: {args.out_csv} (rows={len(csv_rows)})"
+        )
 
     if out_trn_mode:
         print(f"[normalize_ref] Done. rows={num_rows}")

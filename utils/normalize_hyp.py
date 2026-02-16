@@ -21,7 +21,11 @@ def get_parser():
         )
     )
     p.add_argument("--csv", required=True, help="Input CSV, e.g. eval/dev.merged.csv")
-    p.add_argument("--hyp-col", default="raw_hypos", help="Hypothesis column name (default: raw_hypos)")
+    p.add_argument(
+        "--hyp-col",
+        default="raw_hypos",
+        help="Hypothesis column name (default: raw_hypos)",
+    )
     p.add_argument("--out-hyp", default=None, help="Output hyp.trn path.")
     p.add_argument(
         "--out-csv",
@@ -115,7 +119,10 @@ def main():
     with open(args.csv, "r", encoding="utf-8") as f_csv:
         reader = csv.DictReader(f_csv)
         if args.hyp_col not in reader.fieldnames:
-            print(f"ERROR: hyp-col '{args.hyp_col}' not in CSV header: {reader.fieldnames}", file=sys.stderr)
+            print(
+                f"ERROR: hyp-col '{args.hyp_col}' not in CSV header: {reader.fieldnames}",
+                file=sys.stderr,
+            )
             sys.exit(1)
 
         if out_csv_mode:
@@ -150,10 +157,14 @@ def main():
         if out_dir:
             os.makedirs(out_dir, exist_ok=True)
         with open(args.out_csv, "w", encoding="utf-8", newline="") as f_out:
-            writer = csv.DictWriter(f_out, fieldnames=csv_fieldnames, extrasaction="ignore")
+            writer = csv.DictWriter(
+                f_out, fieldnames=csv_fieldnames, extrasaction="ignore"
+            )
             writer.writeheader()
             writer.writerows(csv_rows)
-        print(f"[normalize_hyp] Wrote CSV with column '{args.out_hyp_col}': {args.out_csv} (rows={len(csv_rows)})")
+        print(
+            f"[normalize_hyp] Wrote CSV with column '{args.out_hyp_col}': {args.out_csv} (rows={len(csv_rows)})"
+        )
 
     if out_trn_mode:
         print(f"[normalize_hyp] Done. rows={num_rows}")
