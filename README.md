@@ -19,7 +19,10 @@ Output: `DATA_ROOT/manifest/{Split}.csv` with columns `id`, `text`, `norm_text_w
 
 ## 2. Submission Templates
 
-See [`track1_starting_kit/README.md`](track1_starting_kit/README.md).
+| Track | Description | Starting Kit |
+|---|---|---|
+| Track 1 | Unconstrained ASR (accuracy) | [`track1_starting_kit/README.md`](track1_starting_kit/README.md) |
+| Track 2 | Streaming ASR (accuracy + latency) | [`track2_starting_kit/README.md`](track2_starting_kit/README.md) |
 
 ## 3. Evaluation
 
