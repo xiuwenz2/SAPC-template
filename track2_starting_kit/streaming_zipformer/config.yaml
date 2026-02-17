@@ -1,0 +1,41 @@
+# =====================================================================
+#  Streaming Zipformer — Configuration
+#
+#  All tunable settings live here. Edit values below to experiment,
+#  then re-run. No need to modify model.py.
+#
+#  Beginner tips:
+#    - chunk_size controls latency vs accuracy:
+#        Larger  -> more accurate, but higher latency
+#        Smaller -> faster response, but less accurate
+#    - num_active_paths controls beam search width:
+#        Larger  -> better accuracy, but slower decoding
+# =====================================================================
+
+# --- Audio Input ---
+audio:
+  sample_rate: 16000              # Sample rate in Hz (16 kHz is standard for ASR)
+
+# --- Model Checkpoint ---
+weights:
+  epoch: 30                       # Which checkpoint to load (epoch-30.pt)
+
+# --- Encoder (Zipformer) ---
+encoder:
+  chunk_size: 16                  # Frames per chunk (16 frames ~ 320 ms of audio)
+  left_context_frames: 128        # How many past frames the encoder can attend to
+
+# --- Decoder (Transducer Predictor) ---
+decoder:
+  context_size: 2                 # Number of previous tokens used as context
+
+# --- Feature Computation ---
+features:
+  mode: incremental               # Options: full | incremental
+                                  #   full:        Recompute all Fbank features each time (simple, O(n²))
+                                  #   incremental: Only compute new features (like sherpa-onnx, O(n), lower latency)
+
+# --- Decoding Strategy ---
+decoding:
+  method: modified_beam_search    # Options: greedy_search | modified_beam_search
+  num_active_paths: 4             # Beam width (only used with beam search)
