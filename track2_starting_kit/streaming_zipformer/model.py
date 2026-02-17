@@ -53,10 +53,10 @@ from kaldifeat import Fbank, FbankOptions
 # =====================================================================
 # All paths are relative to this file's location so the code works
 # regardless of where the submission is unpacked.
-_DIR       = Path(os.path.dirname(os.path.abspath(__file__)))
-_ICEFALL   = _DIR / "icefall"
+_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
+_ICEFALL = _DIR / "icefall"
 _ZIPFORMER = _ICEFALL / "egs" / "librispeech" / "ASR" / "zipformer"
-_WEIGHTS   = _DIR / "weights"
+_WEIGHTS = _DIR / "weights"
 
 # Add icefall source directories to Python path so we can import
 # model definitions, training helpers, and decoding utilities.
@@ -66,8 +66,8 @@ sys.path.insert(0, str(_ZIPFORMER))
 # =====================================================================
 # Section 3: Icefall Imports (available only after path setup above)
 # =====================================================================
-from icefall.checkpoint import load_checkpoint      # loads .pt checkpoint
-from icefall.utils import AttributeDict              # dict with dot access
+from icefall.checkpoint import load_checkpoint  # loads .pt checkpoint
+from icefall.utils import AttributeDict  # dict with dot access
 from decode_stream import DecodeStream as _BaseDecodeStream  # feature-level stream
 from streaming_decode import decode_one_chunk, get_init_states
 from train import add_model_arguments, get_model, get_params
@@ -94,15 +94,20 @@ class DecodeStream(_BaseDecodeStream):
       - "incremental": only compute new features         (O(n), lower latency)
     """
 
-    _FRAME_SHIFT_MS = 10.0    # Kaldi default frame shift
-    _FRAME_LENGTH_MS = 25.0   # Kaldi default frame length
+    _FRAME_SHIFT_MS = 10.0  # Kaldi default frame shift
+    _FRAME_LENGTH_MS = 25.0  # Kaldi default frame length
 
-    def __init__(self, *args, sample_rate: int = config.audio.sample_rate,
-                 incremental: bool = False, **kwargs):
+    def __init__(
+        self,
+        *args,
+        sample_rate: int = config.audio.sample_rate,
+        incremental: bool = False,
+        **kwargs,
+    ):
         device = kwargs.get("device", torch.device("cpu"))
         super().__init__(*args, **kwargs)
         self._sample_rate = sample_rate
-        self._audio_samples: List[torch.Tensor] = []   # accumulated raw audio
+        self._audio_samples: List[torch.Tensor] = []  # accumulated raw audio
         self._is_input_finished = False
         self._incremental = incremental
 
@@ -111,8 +116,8 @@ class DecodeStream(_BaseDecodeStream):
         # features — the standard input format for speech models.
         opts = FbankOptions()
         opts.device = device
-        opts.frame_opts.dither = 0      # disable dither for deterministic output
-        opts.mel_opts.num_bins = 80     # 80-dimensional mel features
+        opts.frame_opts.dither = 0  # disable dither for deterministic output
+        opts.mel_opts.num_bins = 80  # 80-dimensional mel features
         self._fbank = Fbank(opts)
 
         # Incremental mode state
@@ -135,7 +140,9 @@ class DecodeStream(_BaseDecodeStream):
 
     def is_ready(self, chunk_size: int) -> bool:
         """Check if we have enough feature frames to decode one chunk."""
-        return (self.num_frames - self.num_processed_frames) >= chunk_size * 2 + self.pad_length
+        return (
+            self.num_frames - self.num_processed_frames
+        ) >= chunk_size * 2 + self.pad_length
 
     def input_finished(self):
         """Mark audio input as complete and pad features for the encoder tail."""
@@ -161,8 +168,10 @@ class DecodeStream(_BaseDecodeStream):
         # can process the remaining frames that need right-context.
         if self._is_input_finished:
             feats = torch.nn.functional.pad(
-                feats, (0, 0, 0, self.pad_length + 30),
-                mode="constant", value=self.LOG_EPS,
+                feats,
+                (0, 0, 0, self.pad_length + 30),
+                mode="constant",
+                value=self.LOG_EPS,
             )
         self.features = feats
         self.num_frames = feats.size(0)
@@ -200,24 +209,28 @@ class DecodeStream(_BaseDecodeStream):
                 new_feats = self._fbank(audio[overlap_sample:])
                 new_feats = new_feats[1:]  # drop overlap frame
                 if new_feats.size(0) > 0:
-                    self.features = torch.cat(
-                        [self.features, new_feats], dim=0
-                    )
+                    self.features = torch.cat([self.features, new_feats], dim=0)
                     self._num_stable_frames = self.features.size(0)
 
         # Pad when audio input is complete
         if self._is_input_finished:
             if self._num_stable_frames > 0:
                 self.features = torch.nn.functional.pad(
-                    self.features, (0, 0, 0, self.pad_length + 30),
-                    mode="constant", value=self.LOG_EPS,
+                    self.features,
+                    (0, 0, 0, self.pad_length + 30),
+                    mode="constant",
+                    value=self.LOG_EPS,
                 )
             else:
-                device = (self._audio_samples[0].device
-                          if self._audio_samples
-                          else torch.device("cpu"))
+                device = (
+                    self._audio_samples[0].device
+                    if self._audio_samples
+                    else torch.device("cpu")
+                )
                 self.features = torch.full(
-                    (self.pad_length + 30, 80), self.LOG_EPS, device=device,
+                    (self.pad_length + 30, 80),
+                    self.LOG_EPS,
+                    device=device,
                 )
 
         if self._is_input_finished or self._num_stable_frames > 0:
@@ -252,9 +265,9 @@ class Model:
         #   The model predicts token IDs; the tokenizer decodes them to text.
         self._sp = spm.SentencePieceProcessor()
         self._sp.load(self._params.bpe_model)
-        self._params.blank_id   = self._sp.piece_to_id("<blk>")   # blank (transducer)
-        self._params.unk_id     = self._sp.piece_to_id("<unk>")   # unknown token
-        self._params.vocab_size = self._sp.get_piece_size()        # vocabulary size
+        self._params.blank_id = self._sp.piece_to_id("<blk>")  # blank (transducer)
+        self._params.unk_id = self._sp.piece_to_id("<unk>")  # unknown token
+        self._params.vocab_size = self._sp.get_piece_size()  # vocabulary size
 
         # Step 3: Load the acoustic model (Zipformer encoder + Transducer decoder).
         self._model = get_model(self._params)
@@ -262,10 +275,10 @@ class Model:
             f"{self._params.exp_dir}/epoch-{self._params.epoch}.pt",
             self._model,
         )
-        self._model.to(self._device).eval()   # move to device & set inference mode
+        self._model.to(self._device).eval()  # move to device & set inference mode
         self._model.device = self._device
 
-        self._stream = None   # created fresh in reset() for each audio file
+        self._stream = None  # created fresh in reset() for each audio file
         print(f"Model loaded on {self._device}")
 
     # -----------------------------------------------------------------
@@ -292,7 +305,9 @@ class Model:
 
     def accept_chunk(self, audio_chunk: np.ndarray) -> str:
         """Feed one audio chunk (float32, 16 kHz) and return partial transcription."""
-        self._stream.accept_waveform(config.audio.sample_rate, torch.from_numpy(audio_chunk))
+        self._stream.accept_waveform(
+            config.audio.sample_rate, torch.from_numpy(audio_chunk)
+        )
         self._decode_available()
         return self._sp.decode(self._stream.decoding_result())
 
@@ -331,28 +346,30 @@ class Model:
         parser.set_defaults(
             chunk_size=str(config.encoder.chunk_size),
             left_context_frames=str(config.encoder.left_context_frames),
-            causal=True,                      # must be True for streaming
+            causal=True,  # must be True for streaming
         )
         params.update(vars(parser.parse_args([])))
 
         # --- Source 3: config.yaml values (highest priority) ---
-        params.sample_rate         = config.audio.sample_rate
-        params.epoch               = config.weights.epoch
-        params.chunk_size          = str(config.encoder.chunk_size)
+        params.sample_rate = config.audio.sample_rate
+        params.epoch = config.weights.epoch
+        params.chunk_size = str(config.encoder.chunk_size)
         params.left_context_frames = str(config.encoder.left_context_frames)
-        params.context_size        = config.decoder.context_size
-        params.decoding_method     = config.decoding.method
-        params.num_active_paths    = config.decoding.num_active_paths
+        params.context_size = config.decoder.context_size
+        params.decoding_method = config.decoding.method
+        params.num_active_paths = config.decoding.num_active_paths
 
         # --- File paths (derived from _WEIGHTS) ---
-        params.exp_dir   = str(_WEIGHTS / "exp")
+        params.exp_dir = str(_WEIGHTS / "exp")
         params.bpe_model = str(_WEIGHTS / "data" / "lang_bpe_500" / "bpe.model")
 
         return params
 
     def _decode_available(self):
         """Decode as many chunks as the stream currently has ready."""
-        while self._stream.is_ready(config.encoder.chunk_size) and not self._stream.done:
+        while (
+            self._stream.is_ready(config.encoder.chunk_size) and not self._stream.done
+        ):
             if decode_one_chunk(self._params, self._model, [self._stream]):
                 break
             # Notify ingestion of partial result via callback
