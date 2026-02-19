@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "=== Canary-Qwen: installing system dependencies ==="
-apt-get update -qq
-apt-get install -y -qq libsndfile1 ffmpeg > /dev/null 2>&1
-
 # ── Create a clean venv to bypass conda's broken CUDA / numpy .so files ──
 echo "=== Canary-Qwen: creating clean venv ==="
 python3 -m venv /opt/canary_venv

@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "=== Parakeet: installing system dependencies ==="
-apt-get update -qq
-apt-get install -y -qq libsndfile1 ffmpeg > /dev/null 2>&1
-
 # ── Create a clean venv to bypass conda's broken CUDA / numpy .so files ──
 # The conda env may have PyTorch built for a different CUDA arch, causing
 # "no kernel image is available for execution on the device".

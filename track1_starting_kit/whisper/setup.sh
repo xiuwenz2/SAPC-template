@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "=== Whisper: installing system dependencies ==="
-apt-get update -qq
-apt-get install -y -qq libsndfile1 ffmpeg > /dev/null 2>&1
-
 echo "=== Whisper: installing Python packages ==="
 pip install --no-cache-dir \
     "huggingface_hub>=0.20" \

@@ -22,13 +22,9 @@ TORCH_VER=$(python3 -c "import torch; print(torch.__version__.split('+')[0])")
 PY_TAG="cp$(python3 -c "import sys; print(f'{sys.version_info.major}{sys.version_info.minor}')")"
 echo "PyTorch version: $TORCH_VER | Python tag: $PY_TAG"
 
-# Helper function: scrape a wheel index page and find the correct
-# .whl file matching our PyTorch version and Python version.
-find_wheel() {
-    curl -sL "$1" | grep -oP 'href="\K[^"]*' \
-        | grep -i "torch${TORCH_VER}" | grep -i "${PY_TAG}" | grep -i "manylinux" \
-        | grep '\.whl' | sort | tail -1
-}
+# Direct wheel URLs for torch2.5.0 + cp311 + linux x86_64
+K2_WHEEL="https://huggingface.co/csukuangfj/k2/resolve/main/cpu/1.24.4.dev20250307/linux-x64/k2-1.24.4.dev20250714+cpu.torch2.5.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+KALDIFEAT_WHEEL="https://huggingface.co/csukuangfj/kaldifeat/resolve/main/cpu/1.25.5.dev20250307/linux-x64/kaldifeat-1.25.5.dev20250630+cpu.torch2.5.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
 
 # =============================================================
 # Stage 2: Install packages
@@ -39,10 +35,10 @@ echo "=== Stage 2: Install packages ==="
 pip install -q numpy sentencepiece tqdm huggingface_hub graphviz lhotse omegaconf
 
 # k2: finite-state transducer library (used by icefall for decoding)
-pip install --no-deps "$(find_wheel https://k2-fsa.github.io/k2/cpu.html)"
+pip install --no-deps "$K2_WHEEL"
 
 # kaldifeat: audio feature extraction (Fbank/MFCC, Kaldi-compatible)
-pip install --no-deps "$(find_wheel https://csukuangfj.github.io/kaldifeat/cpu.html)"
+pip install --no-deps "$KALDIFEAT_WHEEL"
 
 # icefall: speech recognition toolkit built on k2 + PyTorch
 git clone --depth 1 https://github.com/k2-fsa/icefall.git "$DIR/icefall"
