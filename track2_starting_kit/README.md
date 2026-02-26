@@ -46,7 +46,7 @@ class Model:
 
 The ingestion program evaluates each audio file in **two passes**:
 
-1. **Pass 1 — Batch (accuracy)**: single-thread, no delay, feeds all chunks as fast as possible. `set_partial_callback` is set to a no-op.
+1. **Pass 1 — Batch (accuracy)**: multiprocess (parallel workers), no delay, feeds all chunks as fast as possible. Within each worker, chunks are processed sequentially, and `set_partial_callback` is set to a no-op.
 2. **Pass 2 — Streaming (latency)**: two-thread real-time simulation. The **Audio Sender thread** sends 100ms chunks at real-time pace; the **Decoder thread** calls your model's `accept_chunk()` / `input_finished()` and collects partial results via the callback.
 
 All model methods are called **from the Decoder thread only** — your model does **not** need to handle thread safety.
@@ -74,7 +74,7 @@ submission.zip
 
 ## Environment
 
-- Docker image: `pytorch/pytorch:2.5.0-cuda12.4-cudnn9-runtime`
+- Docker image: `xiuwenz2/sapc2-runtime:latest`
 - Pre-installed: **PyTorch 2.5.0+cu124**, torchaudio, torchvision
 - GPU: CUDA-enabled GPU available (CUDA 12.4)
 - Time limit: 15000 seconds per submission

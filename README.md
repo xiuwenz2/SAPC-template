@@ -58,4 +58,23 @@ spk001_utt002,good morning
 
 **Output**: `DATA_ROOT/eval/metrics.{Split}.json` with `wer` and `cer`.
 
+### Track 2 Latency (stage 3)
+
+You can compute latency directly from a partial results JSON, even without `track2_bundle`.
+
+Use the sister script `steps/eval/evaluate_latency.sh` (recommended for standalone latency).
+
+```bash
+# manifest CSV is required (must contain `id` and your MFA start-time column)
+bash ./steps/eval/evaluate_latency.sh \
+  --partial-json /path/to/Dev.partial_results.json \
+  --manifest-csv /path/to/Dev_streaming.csv \
+  --mfa-col mfa_speech_start \
+  --out-json /path/to/latency.summary.json
+```
+
+Notes:
+- `--manifest-csv` is required for latency evaluation.
+- The CSV must include `id` and your MFA start-time column; use `--mfa-col` to specify its name (default: `mfa_speech_start`).
+
 

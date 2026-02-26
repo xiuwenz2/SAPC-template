@@ -10,10 +10,12 @@ set -euo pipefail
 #   0. Install SCTK (sclite) if not already installed      [one-time]
 #   1. Prepare reference .trn files from CSV columns        [one-time]
 #   2. Evaluate hypothesis against refs (normalize hyp → sclite → metrics)
+#   3. Compute latency metrics from partial results JSON (TTFT/TTLT)
 #
 # Usage:
 #   ./evaluate.sh [--start_stage STAGE] [--stop_stage STAGE] [--split SPLIT]
 #                 [--hyp-csv CSV] [--hyp-col COL]
+#                 [--partial-json JSON] [--manifest-csv CSV]
 #
 #   Default values (modify in script):
 #     DATA_ROOT      : Data root directory
@@ -23,6 +25,7 @@ set -euo pipefail
 #     0: Install SCTK (only needed once)
 #     1: Prepare reference .trn files from CSV columns (only needed once per split)
 #     2: Evaluate (normalize hyp → sclite → metrics)
+#     3: Compute latency metrics from partial_results.json
 # ============================================================================
 
 # Get script directory
@@ -41,6 +44,13 @@ HYP_COL="raw_hypos"                        # column name in hypothesis CSV conta
 START_STAGE=0
 STOP_STAGE=2
 
+# Optional latency stage settings (stage 3)
+PARTIAL_JSON=""                           # path to <split>.partial_results.json
+LATENCY_OUT_JSON=""                       # optional output json path
+LATENCY_SCRIPT="${SCRIPT_DIR}/utils/compute_latency.py"   # override if needed
+LATENCY_MANIFEST_CSV=""                   # required for stage 3: CSV with id + MFA start-time column
+MFA_COL="mfa_speech_start"                # manifest column for force-alignment speech start
+
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -49,6 +59,11 @@ while [[ $# -gt 0 ]]; do
     --split)        SPLIT="$2";        shift 2 ;;
     --hyp-csv)      HYP_CSV="$2";     shift 2 ;;
     --hyp-col)      HYP_COL="$2";     shift 2 ;;
+    --partial-json) PARTIAL_JSON="$2"; shift 2 ;;
+    --manifest-csv) LATENCY_MANIFEST_CSV="$2"; shift 2 ;;
+    --latency-out-json) LATENCY_OUT_JSON="$2"; shift 2 ;;
+    --latency-script) LATENCY_SCRIPT="$2"; shift 2 ;;
+    --mfa-col) MFA_COL="$2"; shift 2 ;;
     *) echo "Unknown argument: $1"; exit 1 ;;
   esac
 done
@@ -61,8 +76,8 @@ MANIFEST_CSV="${DATA_ROOT}/manifest/${SPLIT}.csv"
 REF_DIR="${DATA_ROOT}/manifest"
 
 # Validate stages
-if [[ ! "$START_STAGE" =~ ^[012]$ ]] || [[ ! "$STOP_STAGE" =~ ^[012]$ ]] || [[ $START_STAGE -gt $STOP_STAGE ]]; then
-  echo "Error: Invalid stage parameters (must be 0, 1, or 2, start <= stop)"
+if [[ ! "$START_STAGE" =~ ^[0-3]$ ]] || [[ ! "$STOP_STAGE" =~ ^[0-3]$ ]] || [[ $START_STAGE -gt $STOP_STAGE ]]; then
+  echo "Error: Invalid stage parameters (must be 0, 1, 2, or 3, start <= stop)"
   exit 1
 fi
 
@@ -99,6 +114,26 @@ if [[ $START_STAGE -le 2 ]] && [[ $STOP_STAGE -ge 2 ]]; then
   bash "${STEPS_DIR}/eval/evaluate.sh" "$PROJ_ROOT" "$DATA_ROOT" \
     --split "$SPLIT" --hyp-csv "$HYP_CSV" --hyp-col "$HYP_COL" --ref-dir "$REF_DIR" \
     --manifest-csv "$MANIFEST_CSV"
+fi
+
+# Step 3: Latency metrics from partial results json
+if [[ $START_STAGE -le 3 ]] && [[ $STOP_STAGE -ge 3 ]]; then
+  [[ -z "${PARTIAL_JSON}" ]] && { echo "Error: --partial-json is required for stage 3"; exit 1; }
+  [[ -z "${LATENCY_MANIFEST_CSV}" ]] && {
+    echo "Error: --manifest-csv is required for stage 3."
+    echo "       Provide a special CSV with 'id' and your MFA start-time column (use --mfa-col)."
+    exit 1
+  }
+  LATENCY_EVAL_SH="${STEPS_DIR}/eval/evaluate_latency.sh"
+
+  echo "[3] Computing latency metrics via ${LATENCY_EVAL_SH}"
+  LATENCY_CMD=(bash "${LATENCY_EVAL_SH}" --partial-json "${PARTIAL_JSON}" --mfa-col "${MFA_COL}")
+  LATENCY_CMD+=(--manifest-csv "${LATENCY_MANIFEST_CSV}")
+  if [[ -n "${LATENCY_OUT_JSON}" ]]; then
+    LATENCY_CMD+=(--out-json "${LATENCY_OUT_JSON}")
+  fi
+  LATENCY_CMD+=(--latency-script "${LATENCY_SCRIPT}")
+  "${LATENCY_CMD[@]}"
 fi
 
 echo "Done."

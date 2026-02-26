@@ -42,7 +42,7 @@ submission.zip
 
 ## Environment
 
-- Docker image: `pytorch/pytorch:2.5.0-cuda12.4-cudnn9-runtime`
+- Docker image: `xiuwenz2/sapc2-runtime:latest`
 - Pre-installed: **PyTorch 2.5.0+cu124**, torchaudio, torchvision
 - GPU: CUDA-enabled GPU available (CUDA 12.4)
 - Time limit: 15000 seconds per submission
