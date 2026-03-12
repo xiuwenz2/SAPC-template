@@ -40,6 +40,27 @@ submission.zip
 
 4. Upload the zip on the competition page.
 
+## Local Dev Test (with Dev set)
+
+You can run local decoding without Codabench by using `local_decode.py`.
+
+Example:
+
+```bash
+cd track1_starting_kit
+python local_decode.py \
+  --submission-dir ./whisper \
+  --manifest-csv /path/to/data_root/manifest/Dev.csv \
+  --data-root /path/to/data_root \
+  --out-csv ./Dev.predict.csv
+```
+
+Notes:
+- `--submission-dir` must contain a `model.py` with class `Model`.
+- Output CSV format is exactly `id,raw_hypos`, compatible with the evaluation script in this repo.
+- `--data-root` should be the same root used when generating `audio_filepath` in the manifest.
+- If `<submission-dir>/setup.sh` exists, `local_decode.py` will run it before loading the model.
+
 ## Environment
 
 - Docker image: `xiuwenz2/sapc2-runtime:latest`
