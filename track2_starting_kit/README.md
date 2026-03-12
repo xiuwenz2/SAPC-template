@@ -76,7 +76,7 @@ submission.zip
 
 - Docker image: `xiuwenz2/sapc2-runtime:latest`
 - Pre-installed: **PyTorch 2.5.0+cu124**, torchaudio, torchvision
-- GPU: Track 2 is evaluated exclusively on CPU
+- GPU: **Track 2 is evaluated exclusively on CPUs**
 - Time limit: 15000 seconds per submission
 - If a `setup.sh` is provided, it runs **before** your model is loaded. Use it to install system packages and Python dependencies.
 - If a `requirements.txt` is provided, dependencies are auto-installed via `pip install -r requirements.txt` after `setup.sh`.
@@ -89,4 +89,5 @@ submission.zip
 - `accept_chunk()` receives a `np.ndarray` (float32, 16kHz, mono) and must return a string.
 - `input_finished()` must return the final transcription string.
 - Do **not** hardcode dataset file paths. Audio is sent to your model chunk by chunk.
+
 
