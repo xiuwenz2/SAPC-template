@@ -9,13 +9,25 @@
 ./preprocess.sh --start_stage 1 --stop_stage 3 --splits Train Dev
 ```
 
+For latency-focused streaming subset generation, run optional stage 4:
+
+```bash
+# Also set WEBRTCVAD_ENV and MFA_ENV in preprocess.sh
+./preprocess.sh --start_stage 4 --stop_stage 4 --splits Dev
+```
+
 | Stage | What it does |
 |---|---|
 | 1 | Environment setup (conda + pip) |
 | 2 | Extract tar files → `raw/` |
 | 3 | Resample audio, copy JSONs, generate manifest CSVs, normalize refs |
+| 4 | Generate streaming subset for latency tests (duration filter → VAD → MFA → alignment/tail-gap filtering → per-speaker sampling → duration stats) |
 
 Output: `DATA_ROOT/manifest/{Split}.csv` with columns `id`, `text`, `norm_text_with_disfluency`, `norm_text_without_disfluency`.
+
+Stage 4 outputs include:
+- Final subset CSV: `DATA_ROOT/manifest/{Split}_streaming.csv`
+- Intermediate files: `DATA_ROOT/manifest/tmp/`
 
 ## 2. Submission Templates
 

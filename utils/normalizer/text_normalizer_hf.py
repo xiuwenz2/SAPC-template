@@ -507,7 +507,6 @@ class EnglishSpellingNormalizer:
 
 
 class EnglishTextNormalizer:
-
     def __init__(self, english_spelling_mapping=english_spelling_normalizer):
         self.ignore_patterns = r"\b(hmm|mm|mhm|mmm|uh|um)\b"
         self.replacers = {
