@@ -72,6 +72,29 @@ submission.zip
 
 4. Upload the zip on the competition page.
 
+## Local Dev Test (with Dev set)
+
+You can run local decoding without Codabench by using `local_decode.py`.
+
+Example:
+
+```bash
+cd track2_starting_kit
+python3 local_decode.py \
+  --submission-dir ./streaming_zipformer \
+  --manifest-csv /path/to/data_root/manifest/Dev.csv \
+  --streaming-manifest-csv /path/to/data_root/manifest/Dev_streaming.csv \
+  --data-root /path/to/data_root \
+  --out-csv ./Dev.predict.csv \
+  --out-partial-json ./Dev.partial_results.json
+```
+
+Notes:
+- `--submission-dir` must contain a `model.py` with the 5-method streaming interface.
+- If `--streaming-manifest-csv` is not set, the script uses `--manifest-csv` for streaming pass.
+- `--out-csv` is for accuracy evaluation (`id,raw_hypos`).
+- `--out-partial-json` is for latency evaluation (`*.partial_results.json`).
+
 ## Environment
 
 - Docker image: `xiuwenz2/sapc2-runtime:latest`
