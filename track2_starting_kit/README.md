@@ -76,11 +76,11 @@ submission.zip
 
 - Docker image: `xiuwenz2/sapc2-runtime:latest`
 - Pre-installed: **PyTorch 2.5.0+cu124**, torchaudio, torchvision
-- GPU: CUDA-enabled GPU available (CUDA 12.4)
+- GPU: Track 2 is evaluated exclusively on CPU
 - Time limit: 15000 seconds per submission
 - If a `setup.sh` is provided, it runs **before** your model is loaded. Use it to install system packages and Python dependencies.
 - If a `requirements.txt` is provided, dependencies are auto-installed via `pip install -r requirements.txt` after `setup.sh`.
-- **Tip**: For NeMo-based models, we recommend using `setup.sh` to create a clean virtual environment and install dependencies there, to avoid CUDA/numpy conflicts with the base conda environment.
+- **Tip**: We recommend using `setup.sh` to create a clean virtual environment and install dependencies there, to avoid CUDA/numpy conflicts with the base conda environment.
 
 ## Notes
 
@@ -89,3 +89,4 @@ submission.zip
 - `accept_chunk()` receives a `np.ndarray` (float32, 16kHz, mono) and must return a string.
 - `input_finished()` must return the final transcription string.
 - Do **not** hardcode dataset file paths. Audio is sent to your model chunk by chunk.
+
