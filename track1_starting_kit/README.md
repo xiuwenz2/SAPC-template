@@ -44,7 +44,7 @@ submission.zip
 
 - Docker image: `xiuwenz2/sapc2-runtime:latest`
 - Pre-installed: **PyTorch 2.5.0+cu124**, torchaudio, torchvision
-- GPU: One NVIDIA A100-SXM4-80GB GPU available (CUDA 12.8)
+- GPU: **One NVIDIA A100-SXM4-80GB GPU available (CUDA 12.8)**
 - Time limit: 15000 seconds per submission
 - If a `setup.sh` is provided, it runs **before** your model is loaded. Use it to install system packages and Python dependencies.
 - If a `requirements.txt` is provided, dependencies are auto-installed via `pip install -r requirements.txt` after `setup.sh`.
@@ -55,4 +55,5 @@ submission.zip
 - The `Model` class name must be exactly `Model`.
 - `predict()` receives an absolute path to a `.wav` file and must return a string.
 - Do **not** hardcode file paths; use only the `wav_path` argument passed to `predict()`.
+
 
