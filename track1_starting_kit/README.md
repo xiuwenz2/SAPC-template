@@ -66,7 +66,7 @@ Notes:
 - Docker image: `xiuwenz2/sapc2-runtime:latest`
 - Pre-installed: **PyTorch 2.5.0+cu124**, torchaudio, torchvision
 - GPU: **One NVIDIA A100-SXM4-80GB GPU available (CUDA 12.8)**
-- Time limit: 15000 seconds per submission
+- Time limit: <s>15000</s> **21600 seconds per submission**
 - If a `setup.sh` is provided, it runs **before** your model is loaded. Use it to install system packages and Python dependencies.
 - If a `requirements.txt` is provided, dependencies are auto-installed via `pip install -r requirements.txt` after `setup.sh`.
 - **Tip**: For NeMo-based models (parakeet, canary_qwen), we recommend using `setup.sh` to create a clean virtual environment and install dependencies there, to avoid CUDA/numpy conflicts with the base conda environment. See the `parakeet/` or `canary_qwen/` baselines for examples.
