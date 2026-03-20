@@ -66,14 +66,17 @@ def _cer_update(
 
 
 def _cer_update_min_two_refs(
-    preds: Union[str, list[str]],
+    preds1: Union[str, list[str]],
+    preds2: Union[str, list[str]],
     target1: Union[str, list[str]],
     target2: Union[str, list[str]],
     clip_at_one: bool = True,
 ) -> tuple[Tensor, Tensor]:
-    """Update CER using two references per prediction and take the smaller per-sentence CER."""
-    if isinstance(preds, str):
-        preds = [preds]
+    """Update CER with dual predictions: preds1->target1, preds2->target2."""
+    if isinstance(preds1, str):
+        preds1 = [preds1]
+    if isinstance(preds2, str):
+        preds2 = [preds2]
     if isinstance(target1, str):
         target1 = [target1]
     if isinstance(target2, str):
@@ -82,12 +85,13 @@ def _cer_update_min_two_refs(
     errors = tensor(0, dtype=torch.float)
     total = tensor(0, dtype=torch.float)
 
-    for pred, tgt1, tgt2 in tqdm(zip(preds, target1, target2)):
-        pred_tokens = pred
+    for pred1, pred2, tgt1, tgt2 in tqdm(zip(preds1, preds2, target1, target2)):
+        pred1_tokens = pred1
+        pred2_tokens = pred2
         tgt1_tokens = tgt1
         tgt2_tokens = tgt2
-        ed1 = _edit_distance(list(pred_tokens), list(tgt1_tokens))
-        ed2 = _edit_distance(list(pred_tokens), list(tgt2_tokens))
+        ed1 = _edit_distance(list(pred1_tokens), list(tgt1_tokens))
+        ed2 = _edit_distance(list(pred2_tokens), list(tgt2_tokens))
         len1 = len(tgt1_tokens)
         len2 = len(tgt2_tokens)
         if clip_at_one:
@@ -259,13 +263,14 @@ class CharErrorRateMinTwoRefs(CharErrorRate):
 
     def update(
         self,
-        preds: Union[str, list[str]],
+        preds1: Union[str, list[str]],
+        preds2: Union[str, list[str]],
         target1: Union[str, list[str]],
         target2: Union[str, list[str]],
     ) -> None:
-        """Update state with predictions and two sets of references."""
+        """Update state with two refs and dual predictions."""
         errors, total = _cer_update_min_two_refs(
-            preds, target1, target2, clip_at_one=self.clip_at_one
+            preds1, preds2, target1, target2, clip_at_one=self.clip_at_one
         )
         self.errors += errors
         self.total += total

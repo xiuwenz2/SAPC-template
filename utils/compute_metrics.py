@@ -152,6 +152,23 @@ def parse_sgml_csdi(
 # ---------- API ----------
 
 
+def _remove_unk_tokens(text: str, unk_token: str = "unk") -> str:
+    return " ".join(tok for tok in text.split() if tok != unk_token)
+
+
+def _is_unk_only_mismatch(
+    preds_ref1: List[str], preds_ref2: List[str], unk_token: str = "unk"
+) -> bool:
+    if len(preds_ref1) != len(preds_ref2):
+        return False
+    for p1, p2 in zip(preds_ref1, preds_ref2):
+        if p1 == p2:
+            continue
+        if _remove_unk_tokens(p1, unk_token) != _remove_unk_tokens(p2, unk_token):
+            return False
+    return True
+
+
 def compute_from_sgml(sgml_ref1: str, sgml_ref2: str):
     """
     Compute min-two-refs WER/CER from two SGML files.
@@ -164,7 +181,9 @@ def compute_from_sgml(sgml_ref1: str, sgml_ref2: str):
         sgml_ref2, process_unk=True, unk_token="unk"
     )
 
-    if preds_ref1 != preds_ref2:
+    if preds_ref1 != preds_ref2 and not _is_unk_only_mismatch(
+        preds_ref1, preds_ref2, unk_token="unk"
+    ):
         print(
             "ERROR: preds from sgml-ref1 and sgml-ref2 are not identical!",
             file=sys.stderr,
@@ -175,16 +194,14 @@ def compute_from_sgml(sgml_ref1: str, sgml_ref2: str):
         )
         sys.exit(1)
 
-    preds = preds_ref1
-
     cer_metric = CharErrorRateMinTwoRefs(clip_at_one=True)
     wer_metric = WordErrorRateMinTwoRefs(clip_at_one=True)
 
-    cer_min = float(cer_metric(preds, target_ref1, target_ref2))
-    wer_min = float(wer_metric(preds, target_ref1, target_ref2))
+    cer_min = float(cer_metric(preds_ref1, preds_ref2, target_ref1, target_ref2))
+    wer_min = float(wer_metric(preds_ref1, preds_ref2, target_ref1, target_ref2))
 
     return {
-        "n_utts": len(preds),
+        "n_utts": len(preds_ref1),
         "wer": wer_min,
         "cer": cer_min,
     }
