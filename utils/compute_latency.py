@@ -14,8 +14,12 @@ Expected per-utterance structure (new format):
 }
 
 Metrics:
-  TTFT = first_partial_time - audio_send_start_time
-  TTLT = final_visible_time - audio_end_oracle_time
+  TTFT        = first_partial_time - audio_send_start_time
+  TTFT-STABLE = first_stable_partial_time - audio_send_start_time
+  TTLT        = final_visible_time - audio_end_oracle_time
+
+TTFT-STABLE is less gameable than raw TTFT (which can be blurted out before
+audio is processed); both are computed and reported alongside TTLT.
 """
 
 import argparse
@@ -99,6 +103,31 @@ def _first_non_empty_or_last_event_time(record: object) -> Optional[float]:
     return events[-1][0]
 
 
+def _first_word(text: str) -> str:
+    words = text.split()
+    return words[0] if words else ""
+
+
+def _stable_partial_time(events: List[Event]) -> Optional[float]:
+    """Scan backward from the final event; return the earliest timestamp
+    where word #0 has already settled to its final value."""
+    if not events:
+        return None
+    final_time, final_text = events[-1]
+    target_word = _first_word(final_text)
+    stable_time = final_time
+    if not target_word:
+        # Final text is empty: fall back to the last event's timestamp,
+        # same "or_last" fallback as TTFT's first-non-empty-partial search.
+        return stable_time
+    for t, txt in reversed(events[:-1]):
+        if _first_word(txt) == target_word:
+            stable_time = t
+        else:
+            break
+    return stable_time
+
+
 def compute_latency_from_partial_json(
     path: str,
     manifest_csv: Optional[str] = None,
@@ -112,6 +141,7 @@ def compute_latency_from_partial_json(
         mfa_start_map = _load_mfa_start_map(manifest_csv, mfa_col)
 
     ttft_values: List[float] = []
+    ttft_stable_values: List[float] = []
     ttlt_values: List[float] = []
     n_total = 0
     n_with_timing = 0
@@ -141,6 +171,10 @@ def compute_latency_from_partial_json(
             ttft = t_first_non_empty - true_speech_start_abs
             ttft_values.append(ttft)
 
+            t_stable = _stable_partial_time(_extract_text_events(record))
+            if t_stable is not None:
+                ttft_stable_values.append(t_stable - true_speech_start_abs)
+
         if t_audio_end_oracle is not None and t_final_visible is not None:
             ttlt = t_final_visible - t_audio_end_oracle
             if ttlt >= 0.0:
@@ -151,8 +185,10 @@ def compute_latency_from_partial_json(
         "n_utts_with_timing": n_with_timing,
         "n_utts_with_mfa_start": n_with_mfa,
         "ttft_definition": "first_non_empty_partial_or_last - (audio_send_start + mfa_speech_start)",
+        "ttft_stable_definition": "first_stable_partial_or_last - (audio_send_start + mfa_speech_start)",
         "ttlt_definition": "final_visible - audio_end_oracle",
         "ttft_sec": _summary(ttft_values),
+        "ttft_stable_sec": _summary(ttft_stable_values),
         "ttlt_sec": _summary(ttlt_values),
     }
 

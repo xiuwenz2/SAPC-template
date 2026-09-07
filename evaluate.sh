@@ -10,7 +10,7 @@ set -euo pipefail
 #   0. Install SCTK (sclite) if not already installed      [one-time]
 #   1. Prepare reference .trn files from CSV columns        [one-time]
 #   2. Evaluate hypothesis against refs (normalize hyp → sclite → metrics)
-#   3. Compute latency metrics from partial results JSON (TTFT/TTLT)
+#   3. Compute latency metrics from partial results JSON (TTFT/TTFT-STABLE/TTLT)
 #
 # Usage:
 #   ./evaluate.sh [--start_stage STAGE] [--stop_stage STAGE] [--split SPLIT]
