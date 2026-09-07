@@ -11,6 +11,7 @@ set -euo pipefail
 #   1. Prepare reference .trn files from CSV columns        [one-time]
 #   2. Evaluate hypothesis against refs (normalize hyp → sclite → metrics)
 #   3. Compute latency metrics from partial results JSON (TTFT/TTFT-STABLE/TTLT)
+#   4. Compute stable sentence-prefix match rate from partial results JSON
 #
 # Usage:
 #   ./evaluate.sh [--start_stage STAGE] [--stop_stage STAGE] [--split SPLIT]
@@ -26,6 +27,7 @@ set -euo pipefail
 #     1: Prepare reference .trn files from CSV columns (only needed once per split)
 #     2: Evaluate (normalize hyp → sclite → metrics)
 #     3: Compute latency metrics from partial_results.json
+#     4: Stable sentence-prefix match check from partial_results.json (stable_sentence_prefix_match_rate)
 # ============================================================================
 
 # Get script directory
@@ -51,6 +53,11 @@ LATENCY_SCRIPT="${SCRIPT_DIR}/utils/compute_latency.py"   # override if needed
 LATENCY_MANIFEST_CSV=""                   # required for stage 3: CSV with id + MFA start-time column
 MFA_COL="mfa_speech_start"                # manifest column for force-alignment speech start
 
+# Optional stable sentence-prefix match stage settings (stage 4)
+STABLE_PREFIX_OUT_JSON=""                 # optional output json path
+STABLE_PREFIX_SCRIPT="${SCRIPT_DIR}/utils/stable_sentence_prefix_match.py"   # override if needed
+STABLE_PREFIX_REF_COL="norm_text_without_disfluency"                  # manifest reference column
+
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -64,6 +71,9 @@ while [[ $# -gt 0 ]]; do
     --latency-out-json) LATENCY_OUT_JSON="$2"; shift 2 ;;
     --latency-script) LATENCY_SCRIPT="$2"; shift 2 ;;
     --mfa-col) MFA_COL="$2"; shift 2 ;;
+    --stable-prefix-out-json) STABLE_PREFIX_OUT_JSON="$2"; shift 2 ;;
+    --stable-prefix-script) STABLE_PREFIX_SCRIPT="$2"; shift 2 ;;
+    --stable-prefix-ref-col) STABLE_PREFIX_REF_COL="$2"; shift 2 ;;
     *) echo "Unknown argument: $1"; exit 1 ;;
   esac
 done
@@ -76,8 +86,8 @@ MANIFEST_CSV="${DATA_ROOT}/manifest/${SPLIT}.csv"
 REF_DIR="${DATA_ROOT}/manifest"
 
 # Validate stages
-if [[ ! "$START_STAGE" =~ ^[0-3]$ ]] || [[ ! "$STOP_STAGE" =~ ^[0-3]$ ]] || [[ $START_STAGE -gt $STOP_STAGE ]]; then
-  echo "Error: Invalid stage parameters (must be 0, 1, 2, or 3, start <= stop)"
+if [[ ! "$START_STAGE" =~ ^[0-4]$ ]] || [[ ! "$STOP_STAGE" =~ ^[0-4]$ ]] || [[ $START_STAGE -gt $STOP_STAGE ]]; then
+  echo "Error: Invalid stage parameters (must be 0-4, start <= stop)"
   exit 1
 fi
 
@@ -134,6 +144,21 @@ if [[ $START_STAGE -le 3 ]] && [[ $STOP_STAGE -ge 3 ]]; then
   fi
   LATENCY_CMD+=(--latency-script "${LATENCY_SCRIPT}")
   "${LATENCY_CMD[@]}"
+fi
+
+# Step 4: Stable sentence-prefix match check (stable_sentence_prefix_match_rate)
+if [[ $START_STAGE -le 4 ]] && [[ $STOP_STAGE -ge 4 ]]; then
+  [[ -z "${PARTIAL_JSON}" ]] && { echo "Error: --partial-json is required for stage 4"; exit 1; }
+  STABLE_PREFIX_EVAL_SH="${STEPS_DIR}/eval/evaluate_stable_sentence_prefix_match.sh"
+
+  echo "[4] Computing stable sentence-prefix match rate via ${STABLE_PREFIX_EVAL_SH}"
+  STABLE_PREFIX_CMD=(bash "${STABLE_PREFIX_EVAL_SH}" --partial-json "${PARTIAL_JSON}")
+  STABLE_PREFIX_CMD+=(--manifest-csv "${MANIFEST_CSV}" --ref-col "${STABLE_PREFIX_REF_COL}")
+  if [[ -n "${STABLE_PREFIX_OUT_JSON}" ]]; then
+    STABLE_PREFIX_CMD+=(--out-json "${STABLE_PREFIX_OUT_JSON}")
+  fi
+  STABLE_PREFIX_CMD+=(--stable-prefix-script "${STABLE_PREFIX_SCRIPT}")
+  "${STABLE_PREFIX_CMD[@]}"
 fi
 
 echo "Done."
