@@ -89,4 +89,23 @@ Notes:
 - `--manifest-csv` is required for latency evaluation.
 - The CSV must include `id` and your MFA start-time column; use `--mfa-col` to specify its name (default: `mfa_speech_start`).
 
+### Track 2 Rejection Check (stage 4)
+
+A Track 2 submission is rejected if either rule fails:
+
+1. **Early first-word emission:** on more than **5%** of Test1 streaming utterances, the first word has already settled to its final value before speech begins (`first_stable_partial_time < audio_send_start_time + mfa_speech_start`, i.e. TTFT-stable < 0).
+2. **Pass 1 / Pass 2 consistency:** for every Test1/Test2 streaming utterance, the Pass 2 final transcript (last `final_visible` event in `*.partial_results.json`) must match the Pass 1 transcript (`*.predict.csv`) after hypothesis normalization.
+
+Use `steps/eval/evaluate_track2_reject_check.sh` (wraps [`utils/track2_reject_check.py`](utils/track2_reject_check.py)):
+
+```bash
+bash ./steps/eval/evaluate_track2_reject_check.sh \
+  --partial-json /path/to/Dev.partial_results.json \
+  --manifest-csv /path/to/Dev_streaming.csv \
+  --predict-csv /path/to/Dev.predict.csv \
+  --out-json /path/to/reject_check.json
+```
+
+The output reports `early_emission_rate`, `final_match_rate`, `rejected`, and the failing `reasons`.
+
 

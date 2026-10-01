@@ -11,12 +11,13 @@ set -euo pipefail
 #   1. Prepare reference .trn files from CSV columns        [one-time]
 #   2. Evaluate hypothesis against refs (normalize hyp → sclite → metrics)
 #   3. Compute latency metrics from partial results JSON (TTFT/TTFT-STABLE/TTLT)
-#   4. Compute stable sentence-prefix match rate from partial results JSON
+#   4. Track 2 rejection check (early first-word emission + Pass 1/Pass 2 consistency)
 #
 # Usage:
 #   ./evaluate.sh [--start_stage STAGE] [--stop_stage STAGE] [--split SPLIT]
 #                 [--hyp-csv CSV] [--hyp-col COL]
 #                 [--partial-json JSON] [--manifest-csv CSV]
+#                 [--early-emission-threshold T]
 #
 #   Default values (modify in script):
 #     DATA_ROOT      : Data root directory
@@ -27,7 +28,7 @@ set -euo pipefail
 #     1: Prepare reference .trn files from CSV columns (only needed once per split)
 #     2: Evaluate (normalize hyp → sclite → metrics)
 #     3: Compute latency metrics from partial_results.json
-#     4: Stable sentence-prefix match check from partial_results.json (stable_sentence_prefix_match_rate)
+#     4: Track 2 rejection check from partial_results.json + hypothesis CSV (Pass 1)
 # ============================================================================
 
 # Get script directory
@@ -53,10 +54,11 @@ LATENCY_SCRIPT="${SCRIPT_DIR}/utils/compute_latency.py"   # override if needed
 LATENCY_MANIFEST_CSV=""                   # required for stage 3: CSV with id + MFA start-time column
 MFA_COL="mfa_speech_start"                # manifest column for force-alignment speech start
 
-# Optional stable sentence-prefix match stage settings (stage 4)
-STABLE_PREFIX_OUT_JSON=""                 # optional output json path
-STABLE_PREFIX_SCRIPT="${SCRIPT_DIR}/utils/stable_sentence_prefix_match.py"   # override if needed
-STABLE_PREFIX_REF_COL="norm_text_without_disfluency"                  # manifest reference column
+# Optional Track 2 rejection check stage settings (stage 4; uses --partial-json,
+# --manifest-csv, and --hyp-csv/--hyp-col as the Pass 1 predict.csv)
+REJECT_OUT_JSON=""                        # optional output json path
+REJECT_SCRIPT="${SCRIPT_DIR}/utils/track2_reject_check.py"   # override if needed
+EARLY_EMISSION_THRESHOLD="0.05"           # reject if early_emission_rate is above this
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -71,9 +73,9 @@ while [[ $# -gt 0 ]]; do
     --latency-out-json) LATENCY_OUT_JSON="$2"; shift 2 ;;
     --latency-script) LATENCY_SCRIPT="$2"; shift 2 ;;
     --mfa-col) MFA_COL="$2"; shift 2 ;;
-    --stable-prefix-out-json) STABLE_PREFIX_OUT_JSON="$2"; shift 2 ;;
-    --stable-prefix-script) STABLE_PREFIX_SCRIPT="$2"; shift 2 ;;
-    --stable-prefix-ref-col) STABLE_PREFIX_REF_COL="$2"; shift 2 ;;
+    --reject-out-json) REJECT_OUT_JSON="$2"; shift 2 ;;
+    --reject-script) REJECT_SCRIPT="$2"; shift 2 ;;
+    --early-emission-threshold) EARLY_EMISSION_THRESHOLD="$2"; shift 2 ;;
     *) echo "Unknown argument: $1"; exit 1 ;;
   esac
 done
@@ -146,19 +148,25 @@ if [[ $START_STAGE -le 3 ]] && [[ $STOP_STAGE -ge 3 ]]; then
   "${LATENCY_CMD[@]}"
 fi
 
-# Step 4: Stable sentence-prefix match check (stable_sentence_prefix_match_rate)
+# Step 4: Track 2 rejection check (early first-word emission + Pass 1/Pass 2 consistency)
 if [[ $START_STAGE -le 4 ]] && [[ $STOP_STAGE -ge 4 ]]; then
   [[ -z "${PARTIAL_JSON}" ]] && { echo "Error: --partial-json is required for stage 4"; exit 1; }
-  STABLE_PREFIX_EVAL_SH="${STEPS_DIR}/eval/evaluate_stable_sentence_prefix_match.sh"
+  [[ -z "${LATENCY_MANIFEST_CSV}" ]] && {
+    echo "Error: --manifest-csv is required for stage 4 (streaming manifest with 'id' + --mfa-col)."
+    exit 1
+  }
+  REJECT_EVAL_SH="${STEPS_DIR}/eval/evaluate_track2_reject_check.sh"
 
-  echo "[4] Computing stable sentence-prefix match rate via ${STABLE_PREFIX_EVAL_SH}"
-  STABLE_PREFIX_CMD=(bash "${STABLE_PREFIX_EVAL_SH}" --partial-json "${PARTIAL_JSON}")
-  STABLE_PREFIX_CMD+=(--manifest-csv "${MANIFEST_CSV}" --ref-col "${STABLE_PREFIX_REF_COL}")
-  if [[ -n "${STABLE_PREFIX_OUT_JSON}" ]]; then
-    STABLE_PREFIX_CMD+=(--out-json "${STABLE_PREFIX_OUT_JSON}")
+  echo "[4] Running Track 2 rejection check via ${REJECT_EVAL_SH}"
+  REJECT_CMD=(bash "${REJECT_EVAL_SH}" --partial-json "${PARTIAL_JSON}")
+  REJECT_CMD+=(--manifest-csv "${LATENCY_MANIFEST_CSV}" --mfa-col "${MFA_COL}")
+  REJECT_CMD+=(--predict-csv "${HYP_CSV}" --hyp-col "${HYP_COL}")
+  REJECT_CMD+=(--early-emission-threshold "${EARLY_EMISSION_THRESHOLD}")
+  if [[ -n "${REJECT_OUT_JSON}" ]]; then
+    REJECT_CMD+=(--out-json "${REJECT_OUT_JSON}")
   fi
-  STABLE_PREFIX_CMD+=(--stable-prefix-script "${STABLE_PREFIX_SCRIPT}")
-  "${STABLE_PREFIX_CMD[@]}"
+  REJECT_CMD+=(--reject-script "${REJECT_SCRIPT}")
+  "${REJECT_CMD[@]}"
 fi
 
 echo "Done."
